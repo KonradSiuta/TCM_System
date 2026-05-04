@@ -8,4 +8,8 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TCM.Shared\TCM.Shared.csproj" />
+  </ItemGroup>
+
 </Project>
