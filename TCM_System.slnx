@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="TCM.Api/TCM.Api.csproj" />
+  <Project Path="TCM.DesktopClient/TCM.DesktopClient.csproj" />
+  <Project Path="TCM.Shared/TCM.Shared.csproj" />
+</Solution>
