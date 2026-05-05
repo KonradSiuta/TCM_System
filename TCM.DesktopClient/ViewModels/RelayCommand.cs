@@ -3,7 +3,6 @@ using System.Windows.Input;
 
 namespace TCM.DesktopClient.ViewModels
 {
-    // Ta klasa pozwala nam "podpiąć" metody z ViewModelu pod przyciski w Widoku
     public class RelayCommand : ICommand
     {
         private readonly Action _execute;

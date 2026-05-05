@@ -2,11 +2,13 @@
 using Microsoft.EntityFrameworkCore;
 using TCM.Api.Data;
 using TCM.Shared.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TCM.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ProjectsController : ControllerBase
     {
         private readonly TcmDbContext _context;

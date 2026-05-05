@@ -1,16 +1,28 @@
 @TCM.Api_HostAddress = https://localhost:7243
 
-### 1. Pobierz wszystkie projekty (Oczekiwany wynik: pusta lista [])
-GET {{TCM.Api_HostAddress}}/api/Projects
-Accept: application/json
-
-### 2. Utwórz nowy projekt
-POST {{TCM.Api_HostAddress}}/api/Projects
+### 1. Rejestracja nowego użytkownika
+POST {{TCM.Api_HostAddress}}/api/Auth/register
 Content-Type: application/json
 
 {
-  "name": "Projekt Testowy",
-  "description": "Zapis do bazy MySQL z pliku HTTP",
-  "testCaseParser": 0,
-  "testResultParser": 0
+  "username": "Admin",
+  "email": "admin@tcm.com",
+  "password": "SuperTajneHaslo123!"
 }
+
+### 2. Logowanie (Odbiór tokenu)
+# @name logowanie
+POST {{TCM.Api_HostAddress}}/api/Auth/login
+Content-Type: application/json
+
+{
+  "username": "Admin",
+  "password": "SuperTajneHaslo123!"
+}
+
+### 3. Próba pobrania projektów (Wymaga autoryzacji)
+# Tutaj Visual Studio samo wyciągnie token z odpowiedzi powyżej!
+@token = {{logowanie.response.body.token}}
+
+GET {{TCM.Api_HostAddress}}/api/Projects
+Authorization: Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjEiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiQWRtaW4iLCJleHAiOjE3NzgwOTEyNTAsImlzcyI6IlRjbUFwaSIsImF1ZCI6IlRjbURlc2t0b3BDbGllbnQifQ.OQ3YiOL6WQfd_3kMxIX-qBalzJpfDFMuP8LfgDsriLQ
