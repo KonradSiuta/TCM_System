@@ -1,12 +1,22 @@
 ﻿<Window x:Class="TCM.DesktopClient.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:TCM.DesktopClient"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="TCM System - Pulpit Główny" Height="450" Width="800">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
+        <TextBlock Text="Lista projektów w bazie:" FontSize="18" FontWeight="Bold" Margin="10"/>
+
+        <DataGrid Grid.Row="1" ItemsSource="{Binding Projects}" AutoGenerateColumns="False" 
+                  IsReadOnly="True" Margin="10" AlternatingRowBackground="#FFF0F0F0">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
+                <DataGridTextColumn Header="Nazwa Projektu" Binding="{Binding Name}" Width="200"/>
+                <DataGridTextColumn Header="Opis" Binding="{Binding Description}" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </Window>
