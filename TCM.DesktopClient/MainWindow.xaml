@@ -1,22 +1,44 @@
 ﻿<Window x:Class="TCM.DesktopClient.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="TCM System - Pulpit Główny" Height="450" Width="800">
-    <Grid>
+        Title="TCM System - Pulpit Główny" Height="500" Width="800">
+    <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <!-- Tytuł -->
             <RowDefinition Height="*"/>
+            <!-- Tabela (zajmuje resztę miejsca) -->
+            <RowDefinition Height="Auto"/>
+            <!-- Odstęp -->
+            <RowDefinition Height="Auto"/>
+            <!-- Formularz -->
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Lista projektów w bazie:" FontSize="18" FontWeight="Bold" Margin="10"/>
+        <TextBlock Grid.Row="0" Text="Lista projektów w bazie:" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
 
         <DataGrid Grid.Row="1" ItemsSource="{Binding Projects}" AutoGenerateColumns="False" 
-                  IsReadOnly="True" Margin="10" AlternatingRowBackground="#FFF0F0F0">
+                  IsReadOnly="True" AlternatingRowBackground="#FFF0F0F0">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
                 <DataGridTextColumn Header="Nazwa Projektu" Binding="{Binding Name}" Width="200"/>
+                <DataGridTextColumn Header="Data Uwtorzenia" Binding="{Binding CreatedAt}" Width="100"/>
                 <DataGridTextColumn Header="Opis" Binding="{Binding Description}" Width="*"/>
             </DataGrid.Columns>
         </DataGrid>
+
+        <!-- Formularz dodawania nowego projektu -->
+        <Border Grid.Row="3" Background="#FFEAEAEA" Padding="10" Margin="0,10,0,0" CornerRadius="5">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Nazwa:" VerticalAlignment="Center" Margin="0,0,5,0" FontWeight="SemiBold"/>
+                <!-- Binding dwukierunkowy: UpdateSourceTrigger=PropertyChanged aktualizuje zmienną przy każdym wciśnięciu klawisza -->
+                <TextBox Width="150" Margin="0,0,15,0" Text="{Binding NewProjectName, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Text="Opis:" VerticalAlignment="Center" Margin="0,0,5,0" FontWeight="SemiBold"/>
+                <TextBox Width="300" Margin="0,0,15,0" Text="{Binding NewProjectDescription, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <!-- Przycisk podpięty pod naszą komendę -->
+                <Button Content="Dodaj Projekt" Width="100" Command="{Binding AddProjectCommand}" Background="#FF007ACC" Foreground="White" BorderThickness="0" Padding="5"/>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>

@@ -7,6 +7,7 @@
         public string Name { get; set; }
         public string Environment { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? PlannedEndDate { get; set; }
 
         public Project Project { get; set; }
         public List<TestExecution> Executions { get; set; } = new();

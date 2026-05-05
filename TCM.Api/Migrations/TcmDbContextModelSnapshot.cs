@@ -22,21 +22,6 @@ namespace TCM.Api.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
-            modelBuilder.Entity("RequirementTestCase", b =>
-                {
-                    b.Property<int>("RequirementsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TestCasesId")
-                        .HasColumnType("int");
-
-                    b.HasKey("RequirementsId", "TestCasesId");
-
-                    b.HasIndex("TestCasesId");
-
-                    b.ToTable("RequirementTestCase");
-                });
-
             modelBuilder.Entity("TCM.Shared.Models.Project", b =>
                 {
                     b.Property<int>("Id")
@@ -56,6 +41,9 @@ namespace TCM.Api.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.Property<int>("TestCaseParser")
                         .HasColumnType("int");
 
@@ -65,6 +53,24 @@ namespace TCM.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Projects");
+                });
+
+            modelBuilder.Entity("TCM.Shared.Models.ProjectMember", b =>
+                {
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProjectId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ProjectMembers");
                 });
 
             modelBuilder.Entity("TCM.Shared.Models.Requirement", b =>
@@ -81,23 +87,51 @@ namespace TCM.Api.Migrations
 
                     b.Property<string>("ExternalRequirementId")
                         .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TestCaseId")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.HasKey("Id");
+                    b.Property<string>("Version")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
-                    b.HasIndex("ExternalRequirementId")
-                        .IsUnique();
+                    b.HasKey("Id");
 
                     b.HasIndex("ProjectId");
 
+                    b.HasIndex("TestCaseId");
+
                     b.ToTable("Requirements");
+                });
+
+            modelBuilder.Entity("TCM.Shared.Models.RequirementCoverage", b =>
+                {
+                    b.Property<int>("TestCaseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RequirementId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CoveredVersion")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("TestCaseId", "RequirementId");
+
+                    b.HasIndex("RequirementId");
+
+                    b.ToTable("RequirementCoverages");
                 });
 
             modelBuilder.Entity("TCM.Shared.Models.TestCase", b =>
@@ -114,7 +148,7 @@ namespace TCM.Api.Migrations
 
                     b.Property<string>("ExternalId")
                         .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("IsReadOnly")
                         .HasColumnType("tinyint(1)");
@@ -137,9 +171,6 @@ namespace TCM.Api.Migrations
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ExternalId")
-                        .IsUnique();
 
                     b.HasIndex("ProjectId");
 
@@ -205,6 +236,9 @@ namespace TCM.Api.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<DateTime?>("PlannedEndDate")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
@@ -244,19 +278,48 @@ namespace TCM.Api.Migrations
                     b.ToTable("TestSteps");
                 });
 
-            modelBuilder.Entity("RequirementTestCase", b =>
+            modelBuilder.Entity("TCM.Shared.Models.User", b =>
                 {
-                    b.HasOne("TCM.Shared.Models.Requirement", null)
-                        .WithMany()
-                        .HasForeignKey("RequirementsId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("TCM.Shared.Models.ProjectMember", b =>
+                {
+                    b.HasOne("TCM.Shared.Models.Project", "Project")
+                        .WithMany("Members")
+                        .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TCM.Shared.Models.TestCase", null)
-                        .WithMany()
-                        .HasForeignKey("TestCasesId")
+                    b.HasOne("TCM.Shared.Models.User", "User")
+                        .WithMany("ProjectMemberships")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Project");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TCM.Shared.Models.Requirement", b =>
@@ -267,7 +330,30 @@ namespace TCM.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("TCM.Shared.Models.TestCase", null)
+                        .WithMany("Requirements")
+                        .HasForeignKey("TestCaseId");
+
                     b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("TCM.Shared.Models.RequirementCoverage", b =>
+                {
+                    b.HasOne("TCM.Shared.Models.Requirement", "Requirement")
+                        .WithMany("TestCaseCoverages")
+                        .HasForeignKey("RequirementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TCM.Shared.Models.TestCase", "TestCase")
+                        .WithMany()
+                        .HasForeignKey("TestCaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Requirement");
+
+                    b.Navigation("TestCase");
                 });
 
             modelBuilder.Entity("TCM.Shared.Models.TestCase", b =>
@@ -324,6 +410,8 @@ namespace TCM.Api.Migrations
 
             modelBuilder.Entity("TCM.Shared.Models.Project", b =>
                 {
+                    b.Navigation("Members");
+
                     b.Navigation("Requirements");
 
                     b.Navigation("TestCases");
@@ -331,9 +419,16 @@ namespace TCM.Api.Migrations
                     b.Navigation("TestRuns");
                 });
 
+            modelBuilder.Entity("TCM.Shared.Models.Requirement", b =>
+                {
+                    b.Navigation("TestCaseCoverages");
+                });
+
             modelBuilder.Entity("TCM.Shared.Models.TestCase", b =>
                 {
                     b.Navigation("Executions");
+
+                    b.Navigation("Requirements");
 
                     b.Navigation("Steps");
                 });
@@ -341,6 +436,11 @@ namespace TCM.Api.Migrations
             modelBuilder.Entity("TCM.Shared.Models.TestRun", b =>
                 {
                     b.Navigation("Executions");
+                });
+
+            modelBuilder.Entity("TCM.Shared.Models.User", b =>
+                {
+                    b.Navigation("ProjectMemberships");
                 });
 #pragma warning restore 612, 618
         }

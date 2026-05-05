@@ -12,9 +12,11 @@ namespace TCM.Shared.Models
 
         public TestCaseParserType TestCaseParser { get; set; } = TestCaseParserType.None;
         public TestResultParserType TestResultParser { get; set; } = TestResultParserType.None;
+        public ProjectStatus Status { get; set; } = ProjectStatus.Active;
 
         public List<Requirement> Requirements { get; set; } = new();
         public List<TestCase> TestCases { get; set; } = new();
         public List<TestRun> TestRuns { get; set; } = new();
+        public List<ProjectMember> Members { get; set; } = new();
     }
 }
