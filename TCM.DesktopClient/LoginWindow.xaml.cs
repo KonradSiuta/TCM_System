@@ -41,19 +41,26 @@ namespace TCM.DesktopClient
                 }
                 else
                 {
-                    ErrorText.Text = "Błędna nazwa użytkownika lub hasło!";
+                    ErrorText.Text = "Invalid username or password!";
                     ErrorText.Visibility = Visibility.Visible;
                 }
             }
             catch (Exception)
             {
-                ErrorText.Text = "Brak połączenia z serwerem API.";
+                ErrorText.Text = "Server connection error occured.";
                 ErrorText.Visibility = Visibility.Visible;
             }
             finally
             {
                 LoginBtn.IsEnabled = true;
             }
+        }
+
+        private void OpenRegister_Click(object sender, RoutedEventArgs e)
+        {
+            var registerWindow = new RegisterWindow();
+            registerWindow.Show();
+            this.Close();
         }
     }
 }
