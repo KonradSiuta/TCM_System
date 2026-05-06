@@ -8,6 +8,7 @@ namespace TCM.DesktopClient
         public MainWindow()
         {
             InitializeComponent();
+
             DataContext = new MainViewModel();
         }
     }
