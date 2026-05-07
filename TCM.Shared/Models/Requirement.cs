@@ -10,7 +10,7 @@ namespace TCM.Shared.Models
         public string ExternalRequirementId { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public string Version { get; set; } = "1.0";
+        public double Version { get; set; } = 1.0;
         public RequirementStatus Status { get; set; } = RequirementStatus.Created;
 
         public Project Project { get; set; }

@@ -8,6 +8,6 @@
         public int TestCaseId { get; set; }
         public TestCase TestCase { get; set; }
 
-        public string CoveredVersion { get; set; }
+        public double CoveredVersion { get; set; }
     }
 }

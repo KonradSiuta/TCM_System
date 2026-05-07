@@ -102,9 +102,8 @@ namespace TCM.Api.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Version")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<double>("Version")
+                        .HasColumnType("double");
 
                     b.HasKey("Id");
 
@@ -123,9 +122,8 @@ namespace TCM.Api.Migrations
                     b.Property<int>("RequirementId")
                         .HasColumnType("int");
 
-                    b.Property<string>("CoveredVersion")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<double>("CoveredVersion")
+                        .HasColumnType("double");
 
                     b.HasKey("TestCaseId", "RequirementId");
 
