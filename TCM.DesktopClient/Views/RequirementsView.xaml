@@ -1,0 +1,15 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" x:Class="TCM.DesktopClient.Views.RequirementsView"
+             d:DesignHeight="306.362" d:DesignWidth="831.623">
+    <Grid>
+        <DataGrid ItemsSource="{Binding Requirements}" AutoGenerateColumns="False" IsReadOnly="True" AlternatingRowBackground="#FFF0F0F0">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
+                <DataGridTextColumn Header="Version" Binding="{Binding Version}" Width="80"/>
+                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="120"/>
+                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

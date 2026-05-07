@@ -8,17 +8,19 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Button Grid.Row="0" Content="← Back to Projects" Command="{Binding BackCommand}" Width="150" HorizontalAlignment="Left" Background="Transparent" Foreground="#FF007ACC" BorderThickness="0" Margin="0,0,0,10"/>
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
+            <Button Content="← Back to Projects" Command="{Binding BackCommand}" Width="130" Background="Transparent" Foreground="#FF007ACC" BorderThickness="0" Margin="0,0,15,0"/>
+            <TextBlock Text="{Binding CurrentProject.Name, StringFormat='Dashboard: {0}'}" FontSize="20" FontWeight="Bold" VerticalAlignment="Center"/>
+        </StackPanel>
 
-        <TextBlock Grid.Row="1" Text="{Binding CurrentProject.Name, StringFormat='Requirements for: {0}'}" FontSize="20" FontWeight="Bold" Margin="0,0,0,15"/>
+        <Border Grid.Row="1" Background="#FFEAEAEA" CornerRadius="5" Padding="5" Margin="0,0,0,10">
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Requirements" Command="{Binding ShowRequirementsCommand}" Width="120" Background="#FF007ACC" Foreground="White" BorderThickness="0" Padding="8" Margin="0,0,10,0"/>
+                <Button Content="Test Cases" Command="{Binding ShowTestCasesCommand}" Width="120" Background="#FF007ACC" Foreground="White" BorderThickness="0" Padding="8" Margin="0,0,10,0"/>
+                <Button Content="Test Runs" Width="120" Background="#FF007ACC" Foreground="White" BorderThickness="0" Padding="8" Margin="0,0,10,0"/>
+            </StackPanel>
+        </Border>
 
-        <DataGrid Grid.Row="2" ItemsSource="{Binding Requirements}" AutoGenerateColumns="False" IsReadOnly="True" AlternatingRowBackground="#FFF0F0F0">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
-                <DataGridTextColumn Header="Version" Binding="{Binding Version}" Width="80"/>
-                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="120"/>
-                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
-            </DataGrid.Columns>
-        </DataGrid>
+        <ContentControl Grid.Row="2" Content="{Binding CurrentSubView}"/>
     </Grid>
 </UserControl>

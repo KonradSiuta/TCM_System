@@ -12,6 +12,9 @@
         <DataTemplate DataType="{x:Type viewmodels:ProjectDetailsViewModel}">
             <views:ProjectDetailsView/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:RequirementsViewModel}">
+            <views:RequirementsView/>
+        </DataTemplate>
     </Window.Resources>
 
     <ContentControl Content="{Binding CurrentView}"/>
