@@ -29,7 +29,7 @@ namespace TCM.DesktopClient.ViewModels
 
             ShowRequirementsCommand = new RelayCommand(() => CurrentSubView = new RequirementsViewModel(CurrentProject));
 
-            ShowTestCasesCommand = new RelayCommand(() => CurrentSubView = "");
+            ShowTestCasesCommand = new RelayCommand(() => CurrentSubView = new TestCasesViewModel(CurrentProject));
 
             CurrentSubView = new RequirementsViewModel(CurrentProject);
         }

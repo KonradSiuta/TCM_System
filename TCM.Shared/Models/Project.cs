@@ -10,7 +10,7 @@ namespace TCM.Shared.Models
         public string Description { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        public TestCaseParserType TestCaseParser { get; set; } = TestCaseParserType.None;
+        public string ParserName { get; set; } = "DoxygenStyle";
         public TestResultParserType TestResultParser { get; set; } = TestResultParserType.None;
         public ProjectStatus Status { get; set; } = ProjectStatus.Active;
 

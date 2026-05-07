@@ -26,4 +26,12 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="parsers.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties parsers_1json__JsonSchema="json" /></VisualStudio></ProjectExtensions>
+
 </Project>

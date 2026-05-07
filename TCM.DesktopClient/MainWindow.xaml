@@ -15,6 +15,10 @@
         <DataTemplate DataType="{x:Type viewmodels:RequirementsViewModel}">
             <views:RequirementsView/>
         </DataTemplate>
+
+        <DataTemplate DataType="{x:Type viewmodels:TestCasesViewModel}">
+            <views:TestCasesView/>
+        </DataTemplate>
     </Window.Resources>
 
     <ContentControl Content="{Binding CurrentView}"/>

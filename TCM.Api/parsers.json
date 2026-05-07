@@ -1,0 +1,26 @@
+[
+  {
+    "Name": "DoxygenStyle",
+    "BlockRegex": "/\\*\\*(.*?)\\*/",
+    "IdRegex": "@tc_id\\s+(.+)",
+    "TitleRegex": "@tc_title\\s+(.+)",
+    "DescRegex": "@tc_desc\\s+(.+)",
+    "VersionRegex": "@tc_version\\s+(.+)",
+    "TypeRegex": "@tc_type\\s+(.+)",
+    "SourceRegex": "@tc_source\\s+(.+)",
+    "RequirementRegex": "@tc_req\\s+(.+)",
+    "StepRegex": "@tc_step\\s+([^|]+)\\|\\s*(.+)"
+  },
+  {
+    "Name": "PythonDocstring",
+    "BlockRegex": "\"\"\"(.*?)\"\"\"",
+    "IdRegex": "tc_id:\\s*(.+)",
+    "TitleRegex": "tc_title:\\s*(.+)",
+    "DescRegex": "tc_desc:\\s*(.+)",
+    "VersionRegex": "tc_version:\\s*(.+)",
+    "TypeRegex": "tc_type:\\s*(.+)",
+    "SourceRegex": "tc_source:\\s*(.+)",
+    "RequirementRegex": "tc_req:\\s*(.+)",
+    "StepRegex": "tc_step:\\s*([^|]+)\\|\\s*(.+)"
+  }
+]

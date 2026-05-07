@@ -41,10 +41,11 @@ namespace TCM.Api.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("ParserName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
-                    b.Property<int>("TestCaseParser")
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<int>("TestResultParser")
