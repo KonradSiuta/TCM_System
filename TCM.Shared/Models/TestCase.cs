@@ -15,6 +15,7 @@ namespace TCM.Shared.Models
         public TestType Type { get; set; }
         public TestCaseSource Source { get; set; }
         public bool IsReadOnly { get; set; }
+        public bool IsActive { get; set; } = true;
 
         public Project Project { get; set; }
         public List<Requirement> Requirements { get; set; } = new();

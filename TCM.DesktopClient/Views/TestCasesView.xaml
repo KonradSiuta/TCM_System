@@ -13,13 +13,21 @@
 
         <DataGrid Grid.Row="1" ItemsSource="{Binding TestCases}" AutoGenerateColumns="False" IsReadOnly="True" AlternatingRowBackground="#FFF0F0F0">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Internal ID" Binding="{Binding Id}" Width="80"/>
                 <DataGridTextColumn Header="Ext. ID" Binding="{Binding ExternalId}" Width="100"/>
                 <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="200"/>
-                <DataGridTextColumn Header="Version" Binding="{Binding Version}" Width="70"/>
-                <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="100"/>
-                <DataGridTextColumn Header="Source" Binding="{Binding Source}" Width="120"/>
-                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
+
+                <DataGridCheckBoxColumn Header="Active" Binding="{Binding IsActive}" IsReadOnly="True" Width="60"/>
+
+                <DataGridTemplateColumn Header="Actions" Width="100">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="Deactivate" 
+                        Command="{Binding DataContext.DeactivateCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                        CommandParameter="{Binding}"
+                        Background="#FFDC3545" Foreground="White" BorderThickness="0" Padding="5,2"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

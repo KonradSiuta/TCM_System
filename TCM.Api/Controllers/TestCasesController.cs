@@ -30,10 +30,22 @@ namespace TCM.Api.Controllers
         public async Task<ActionResult<IEnumerable<TestCase>>> GetProjectTestCases(int projectId)
         {
             var testCases = await _context.TestCases
-                .Where(t => t.ProjectId == projectId)
+                .Where(t => t.ProjectId == projectId && t.IsActive)
                 .ToListAsync();
 
             return Ok(testCases);
+        }
+
+        [HttpPatch("{id}/deactivate")]
+        public async Task<IActionResult> DeactivateTestCase(int id)
+        {
+            var testCase = await _context.TestCases.FindAsync(id);
+            if (testCase == null) return NotFound();
+
+            testCase.IsActive = false;
+            await _context.SaveChangesAsync();
+
+            return Ok();
         }
 
         [HttpPost("Project/{projectId}/import-source")]
@@ -74,6 +86,7 @@ namespace TCM.Api.Controllers
                     existingTc.Type = dto.TestCase.Type;
                     existingTc.Source = dto.TestCase.Source;
                     existingTc.Steps = dto.TestCase.Steps;
+                    existingTc.IsActive = true;
                     updated++;
 
                     // TODO: dodać aktualizację tabeli RequirementCoverage 

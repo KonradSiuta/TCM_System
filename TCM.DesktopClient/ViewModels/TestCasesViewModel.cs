@@ -24,6 +24,8 @@ namespace TCM.DesktopClient.ViewModels
 
         public ICommand ImportSourceCommand { get; }
 
+        public ICommand DeactivateCommand { get; }
+
         public TestCasesViewModel(Project project)
         {
             CurrentProject = project;
@@ -34,6 +36,8 @@ namespace TCM.DesktopClient.ViewModels
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", AppSession.JwtToken);
 
             ImportSourceCommand = new RelayCommand(async () => await ImportSourceAsync());
+
+            DeactivateCommand = new RelayCommand<TestCase>(async (tc) => await DeactivateTestCaseAsync(tc));
 
             _ = LoadTestCasesAsync();
         }
@@ -90,6 +94,40 @@ namespace TCM.DesktopClient.ViewModels
                 catch (Exception ex)
                 {
                     System.Windows.MessageBox.Show($"An error occurred:\n{ex.Message}", "Critical Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private async Task DeactivateTestCaseAsync(TestCase tc)
+        {
+            if (tc == null) return;
+
+            var result = System.Windows.MessageBox.Show(
+                $"Are you sure you want to deactivate test case: {tc.ExternalId}?",
+                "Confirm Deactivation",
+                System.Windows.MessageBoxButton.YesNo,
+                System.Windows.MessageBoxImage.Question);
+
+            if (result == System.Windows.MessageBoxResult.Yes)
+            {
+                try
+                {
+                    var request = new HttpRequestMessage(new HttpMethod("PATCH"), $"api/TestCases/{tc.Id}/deactivate");
+                    var response = await _httpClient.SendAsync(request);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        await LoadTestCasesAsync();
+                    }
+                    else
+                    {
+                        var error = await response.Content.ReadAsStringAsync();
+                        System.Windows.MessageBox.Show($"Failed to deactivate:\n{error}", "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Windows.MessageBox.Show($"Error: {ex.Message}", "Critical Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
                 }
             }
         }

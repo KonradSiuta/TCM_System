@@ -149,6 +149,9 @@ namespace TCM.Api.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<bool>("IsReadOnly")
                         .HasColumnType("tinyint(1)");
 
