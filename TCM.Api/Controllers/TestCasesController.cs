@@ -30,6 +30,8 @@ namespace TCM.Api.Controllers
         public async Task<ActionResult<IEnumerable<TestCase>>> GetProjectTestCases(int projectId)
         {
             var testCases = await _context.TestCases
+                .Include(t => t.RequirementCoverages)
+                    .ThenInclude(rc => rc.Requirement)
                 .Where(t => t.ProjectId == projectId && t.IsActive)
                 .ToListAsync();
 
@@ -68,7 +70,11 @@ namespace TCM.Api.Controllers
             var parserEngine = new DynamicRegexParser(template);
             var parsedDtos = parserEngine.Parse(fileContent, projectId);
 
-            int added = 0, updated = 0;
+            int added = 0, updated = 0, linkedReqs = 0;
+
+            var projectReqs = await _context.Requirements
+                .Where(r => r.ProjectId == projectId)
+                .ToListAsync();
 
             foreach (var dto in parsedDtos)
             {
@@ -87,19 +93,53 @@ namespace TCM.Api.Controllers
                     existingTc.Source = dto.TestCase.Source;
                     existingTc.Steps = dto.TestCase.Steps;
                     existingTc.IsActive = true;
-                    updated++;
 
-                    // TODO: dodać aktualizację tabeli RequirementCoverage 
+                    var existingCoverages = await _context.RequirementCoverages
+                        .Where(rc => rc.TestCaseId == existingTc.Id)
+                        .ToListAsync();
+                    _context.RequirementCoverages.RemoveRange(existingCoverages);
+
+                    foreach (var cr in dto.CoveredRequirements)
+                    {
+                        var req = projectReqs.FirstOrDefault(r => r.ExternalRequirementId == cr.ExternalId);
+                        if (req != null)
+                        {
+                            _context.RequirementCoverages.Add(new RequirementCoverage
+                            {
+                                TestCaseId = existingTc.Id,
+                                RequirementId = req.Id,
+                                CoveredVersion = cr.Version
+                            });
+                            linkedReqs++;
+                        }
+                    }
+                    updated++;
                 }
                 else
                 {
                     _context.TestCases.Add(dto.TestCase);
+
+                    foreach (var cr in dto.CoveredRequirements)
+                    {
+                        var req = projectReqs.FirstOrDefault(r => r.ExternalRequirementId == cr.ExternalId);
+                        if (req != null)
+                        {
+                            _context.RequirementCoverages.Add(new RequirementCoverage
+                            {
+                                TestCase = dto.TestCase,
+                                RequirementId = req.Id,
+                                CoveredVersion = cr.Version
+                            });
+                            linkedReqs++;
+                        }
+                    }
                     added++;
                 }
             }
 
             await _context.SaveChangesAsync();
-            return Ok($"Imported: {added}, Updated: {updated}");
+
+            return Ok($"Import finished!\n- Added newly: {added}\n- Updated: {updated}\n- Linked Requirements: {linkedReqs}");
         }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace TCM.Shared.Models
 {
@@ -18,8 +20,13 @@ namespace TCM.Shared.Models
         public bool IsActive { get; set; } = true;
 
         public Project Project { get; set; }
-        public List<Requirement> Requirements { get; set; } = new();
+        public List<RequirementCoverage> RequirementCoverages { get; set; } = new();
         public List<TestStep> Steps { get; set; } = new();
         public List<TestExecution> Executions { get; set; } = new();
+
+        [NotMapped]
+        public string CoveredRequirementsText => RequirementCoverages != null && RequirementCoverages.Any()
+            ? string.Join(", ", RequirementCoverages.Select(rc => rc.Requirement?.ExternalRequirementId))
+            : "None";
     }
 }

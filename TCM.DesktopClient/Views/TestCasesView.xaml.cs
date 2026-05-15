@@ -13,9 +13,7 @@ using System.Windows.Shapes;
 
 namespace TCM.DesktopClient.Views
 {
-    /// <summary>
-    /// Logika interakcji dla klasy TestCasesView.xaml
-    /// </summary>
+
     public partial class TestCasesView : UserControl
     {
         public TestCasesView()
