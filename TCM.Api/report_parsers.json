@@ -1,0 +1,20 @@
+[
+  {
+    "Name": "JUnitXml",
+    "TestCaseNode": "testcase",
+    "IdentityAttribute": "name",
+    "SecondaryIdentityAttribute": "classname",
+    "FailureNode": "failure",
+    "FailureMessageAttribute": "message",
+    "SkippedNode": "skipped"
+  },
+  {
+    "Name": "EcuSimulatorXml",
+    "TestCaseNode": "test-case",
+    "IdentityAttribute": "name",
+    "SecondaryIdentityAttribute": "fullname",
+    "FailureNode": "failure",
+    "FailureMessageAttribute": "message",
+    "SkippedNode": "reason"
+  }
+]

@@ -30,7 +30,11 @@
     <Content Update="parsers.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Update="report_parsers.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
+  
 
   <ProjectExtensions><VisualStudio><UserProperties parsers_1json__JsonSchema="json" /></VisualStudio></ProjectExtensions>
 

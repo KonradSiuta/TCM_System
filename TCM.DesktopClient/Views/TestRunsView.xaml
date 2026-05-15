@@ -70,16 +70,30 @@
                     </Style>
                 </StackPanel.Style>
 
-                <TextBlock Text="{Binding SelectedRun.Name}" FontSize="18" FontWeight="Bold" Margin="0,0,0,5"/>
-                <TextBlock Text="{Binding SelectedRun.Environment, StringFormat='Environment: {0}'}" Margin="0,0,0,15" Foreground="Gray"/>
+                <Grid Margin="0,0,0,15">
+                    <StackPanel>
+                        <TextBlock Text="{Binding SelectedRun.Name}" FontSize="18" FontWeight="Bold" Margin="0,0,0,5"/>
+                        <TextBlock Text="{Binding SelectedRun.Environment, StringFormat='Environment: {0}'}" Foreground="Gray"/>
+                    </StackPanel>
+
+                    <Button Content="Import Automated Results (XML)" Command="{Binding ImportResultsCommand}" HorizontalAlignment="Right" VerticalAlignment="Center" Background="#FF6F42C1" Foreground="White" BorderThickness="0" Padding="10,5"/>
+                </Grid>
 
                 <DataGrid ItemsSource="{Binding SelectedRun.Executions}" AutoGenerateColumns="False" IsReadOnly="True" AlternatingRowBackground="#FFF0F0F0" Height="400">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Test ID" Binding="{Binding TestCase.ExternalId}" Width="100"/>
-                        <DataGridTextColumn Header="Title" Binding="{Binding TestCase.Title}" Width="250"/>
-                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100"/>
+                        <DataGridTextColumn Header="Title" Binding="{Binding TestCase.Title}" Width="200"/>
+                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="80"/>
 
-                        <DataGridTemplateColumn Header="Actions" Width="*">
+                        <DataGridTextColumn Header="Automated Logs / Notes" Binding="{Binding Notes}" Width="250">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextWrapping" Value="Wrap"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTemplateColumn Header="Manual Override" Width="140">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">

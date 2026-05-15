@@ -29,4 +29,15 @@ namespace TCM.Api.Services.Parsers
         public string StepRegex { get; set; }
         public string PriorityRegex { get; set; }
     }
+
+    public class ReportParserTemplate
+    {
+        public string Name { get; set; }
+        public string TestCaseNode { get; set; }
+        public string IdentityAttribute { get; set; }
+        public string SecondaryIdentityAttribute { get; set; }
+        public string FailureNode { get; set; }
+        public string FailureMessageAttribute { get; set; }
+        public string SkippedNode { get; set; }
+    }
 }

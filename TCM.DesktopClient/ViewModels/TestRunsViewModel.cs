@@ -59,6 +59,7 @@ namespace TCM.DesktopClient.ViewModels
         public ICommand CreateRunCommand { get; }
         public ICommand SetPassedCommand { get; }
         public ICommand SetFailedCommand { get; }
+        public ICommand ImportResultsCommand { get; }
 
         public TestRunsViewModel(Project project)
         {
@@ -79,6 +80,8 @@ namespace TCM.DesktopClient.ViewModels
 
             SetPassedCommand = new RelayCommand<TestExecution>(async (ex) => await UpdateStatusAsync(ex, ExecutionStatus.Passed));
             SetFailedCommand = new RelayCommand<TestExecution>(async (ex) => await UpdateStatusAsync(ex, ExecutionStatus.Failed));
+            
+            ImportResultsCommand = new RelayCommand(async () => await ImportResultsAsync());
 
             _ = LoadRunsAsync();
             _ = LoadAvailableTestCasesAsync();
@@ -179,6 +182,49 @@ namespace TCM.DesktopClient.ViewModels
             if (response.IsSuccessStatusCode)
             {
                 await LoadRunDetailsAsync();
+            }
+        }
+
+        private async Task ImportResultsAsync()
+        {
+            if (SelectedRun == null) return;
+
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "XML Reports (*.xml)|*.xml|All files (*.*)|*.*",
+                Title = "Select Test Report File"
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    using var content = new MultipartFormDataContent();
+                    using var fileStream = System.IO.File.OpenRead(openFileDialog.FileName);
+                    using var streamContent = new StreamContent(fileStream);
+
+                    streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/xml");
+                    content.Add(streamContent, "file", System.IO.Path.GetFileName(openFileDialog.FileName));
+
+                    var response = await _httpClient.PostAsync($"api/TestRuns/{SelectedRun.Id}/import-results", content);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var summaryMessage = await response.Content.ReadAsStringAsync();
+                        System.Windows.MessageBox.Show(summaryMessage, "Import Summary", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+
+                        await LoadRunDetailsAsync();
+                    }
+                    else
+                    {
+                        var error = await response.Content.ReadAsStringAsync();
+                        System.Windows.MessageBox.Show($"Import failed:\n{error}", "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Windows.MessageBox.Show($"An error occurred:\n{ex.Message}", "Critical Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                }
             }
         }
 
