@@ -16,6 +16,7 @@ namespace TCM.Shared.Models
 
         public TestType Type { get; set; }
         public TestCaseSource Source { get; set; }
+        public TestPriority Priority { get; set; } = TestPriority.Full;
         public bool IsReadOnly { get; set; }
         public bool IsActive { get; set; } = true;
 

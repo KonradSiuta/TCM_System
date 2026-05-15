@@ -27,5 +27,6 @@ namespace TCM.Api.Services.Parsers
         public string SourceRegex { get; set; }
         public string RequirementRegex { get; set; }
         public string StepRegex { get; set; }
+        public string PriorityRegex { get; set; }
     }
 }

@@ -90,6 +90,7 @@ namespace TCM.Api.Controllers
                     existingTc.Description = dto.TestCase.Description;
                     existingTc.Version = dto.TestCase.Version;
                     existingTc.Type = dto.TestCase.Type;
+                    existingTc.Priority = dto.TestCase.Priority;
                     existingTc.Source = dto.TestCase.Source;
                     existingTc.Steps = dto.TestCase.Steps;
                     existingTc.IsActive = true;

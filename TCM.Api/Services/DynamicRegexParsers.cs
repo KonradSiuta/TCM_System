@@ -43,6 +43,9 @@ namespace TCM.Api.Services.Parsers
                     Enum.TryParse<TestType>(GetTagValue(comment, _template.TypeRegex), true, out var tType);
                     dto.TestCase.Type = tType;
 
+                    Enum.TryParse<TestPriority>(GetTagValue(comment, _template.PriorityRegex), true, out var tPriority);
+                    dto.TestCase.Priority = tPriority;
+
                     Enum.TryParse<TestCaseSource>(GetTagValue(comment, _template.SourceRegex), true, out var tSource);
                     dto.TestCase.Source = tSource;
 

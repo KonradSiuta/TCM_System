@@ -9,7 +9,8 @@
     "TypeRegex": "@tc_type\\s+(.+)",
     "SourceRegex": "@tc_source\\s+(.+)",
     "RequirementRegex": "@tc_req\\s+(.+)",
-    "StepRegex": "@tc_step\\s+([^|]+)\\|\\s*(.+)"
+    "StepRegex": "@tc_step\\s+([^|]+)\\|\\s*(.+)",
+    "PriorityRegex": "@tc_priority\\s+(.+)"
   },
   {
     "Name": "PythonDocstring",
@@ -21,6 +22,7 @@
     "TypeRegex": "tc_type:\\s*(.+)",
     "SourceRegex": "tc_source:\\s*(.+)",
     "RequirementRegex": "tc_req:\\s*(.+)",
-    "StepRegex": "tc_step:\\s*([^|]+)\\|\\s*(.+)"
+    "StepRegex": "tc_step:\\s*([^|]+)\\|\\s*(.+)",
+    "PriorityRegex": "tc_priority:\\s*(.+)"
   }
 ]

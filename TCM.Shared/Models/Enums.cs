@@ -9,4 +9,5 @@
     public enum ProjectStatus { Active, Finished }
     public enum RequirementStatus { Created, InReview, Accepted, Canceled }
     public enum ProjectRole { Administrator, Tester, Viewer }
+    public enum TestPriority { None, Acceptance, Smoke, Regression, Full }
 }

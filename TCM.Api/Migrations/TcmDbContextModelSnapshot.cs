@@ -96,9 +96,6 @@ namespace TCM.Api.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TestCaseId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -109,8 +106,6 @@ namespace TCM.Api.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ProjectId");
-
-                    b.HasIndex("TestCaseId");
 
                     b.ToTable("Requirements");
                 });
@@ -154,6 +149,9 @@ namespace TCM.Api.Migrations
 
                     b.Property<bool>("IsReadOnly")
                         .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("int");
 
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
@@ -332,10 +330,6 @@ namespace TCM.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TCM.Shared.Models.TestCase", null)
-                        .WithMany("Requirements")
-                        .HasForeignKey("TestCaseId");
-
                     b.Navigation("Project");
                 });
 
@@ -348,7 +342,7 @@ namespace TCM.Api.Migrations
                         .IsRequired();
 
                     b.HasOne("TCM.Shared.Models.TestCase", "TestCase")
-                        .WithMany()
+                        .WithMany("RequirementCoverages")
                         .HasForeignKey("TestCaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -430,7 +424,7 @@ namespace TCM.Api.Migrations
                 {
                     b.Navigation("Executions");
 
-                    b.Navigation("Requirements");
+                    b.Navigation("RequirementCoverages");
 
                     b.Navigation("Steps");
                 });
