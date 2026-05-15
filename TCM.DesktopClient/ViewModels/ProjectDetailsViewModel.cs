@@ -21,6 +21,7 @@ namespace TCM.DesktopClient.ViewModels
 
         public ICommand ShowRequirementsCommand { get; }
         public ICommand ShowTestCasesCommand { get; }
+        public ICommand ShowTestRunsCommand { get; }
 
         public ProjectDetailsViewModel(Project project)
         {
@@ -30,6 +31,8 @@ namespace TCM.DesktopClient.ViewModels
             ShowRequirementsCommand = new RelayCommand(() => CurrentSubView = new RequirementsViewModel(CurrentProject));
 
             ShowTestCasesCommand = new RelayCommand(() => CurrentSubView = new TestCasesViewModel(CurrentProject));
+
+            ShowTestRunsCommand = new RelayCommand(() => CurrentSubView = new TestRunsViewModel(CurrentProject));
 
             CurrentSubView = new RequirementsViewModel(CurrentProject);
         }

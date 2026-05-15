@@ -15,9 +15,11 @@
         <DataTemplate DataType="{x:Type viewmodels:RequirementsViewModel}">
             <views:RequirementsView/>
         </DataTemplate>
-
         <DataTemplate DataType="{x:Type viewmodels:TestCasesViewModel}">
             <views:TestCasesView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:TestRunsViewModel}">
+            <views:TestRunsView/>
         </DataTemplate>
     </Window.Resources>
 

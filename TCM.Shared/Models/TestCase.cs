@@ -29,5 +29,8 @@ namespace TCM.Shared.Models
         public string CoveredRequirementsText => RequirementCoverages != null && RequirementCoverages.Any()
             ? string.Join(", ", RequirementCoverages.Select(rc => rc.Requirement?.ExternalRequirementId))
             : "None";
+
+        [NotMapped]
+        public bool IsSelected { get; set; }
     }
 }

@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using TCM.Api.Data;
 using TCM.Shared.Models;
 
@@ -40,26 +44,35 @@ namespace TCM.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<TestRun>> CreateTestRun(TestRun testRun)
+        public async Task<ActionResult<TestRun>> CreateTestRun(CreateTestRunDto dto)
         {
-            var activeTestCases = await _context.TestCases
-                .Where(tc => tc.ProjectId == testRun.ProjectId && tc.IsActive)
-                .ToListAsync();
+            if (dto.TestCaseIds == null || !dto.TestCaseIds.Any())
+                return BadRequest("You must select at least one test case.");
 
-            if (!activeTestCases.Any())
-                return BadRequest("No active test cases found to create a run.");
+            var testRun = new TestRun
+            {
+                ProjectId = dto.ProjectId,
+                Name = dto.Name,
+                Environment = dto.Environment,
+                CreatedAt = DateTime.UtcNow
+            };
 
-            testRun.CreatedAt = DateTime.UtcNow;
             _context.TestRuns.Add(testRun);
             await _context.SaveChangesAsync();
 
-            var executions = activeTestCases.Select(tc => new TestExecution
+            var executions = new List<TestExecution>();
+            foreach (var tcId in dto.TestCaseIds)
             {
-                TestRunId = testRun.Id,
-                TestCaseId = tc.Id,
-                Status = ExecutionStatus.Unexecuted,
-                Mode = tc.Type == TestType.Unit ? ExecutionMode.Automated : ExecutionMode.Manual
-            }).ToList();
+                executions.Add(new TestExecution
+                {
+                    TestRunId = testRun.Id,
+                    TestCaseId = tcId,
+                    Status = ExecutionStatus.Unexecuted,
+                    Mode = ExecutionMode.Manual,
+                    DefectUrl = "",
+                    Notes = ""
+                });
+            }
 
             _context.TestExecutions.AddRange(executions);
             await _context.SaveChangesAsync();
