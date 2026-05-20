@@ -47,5 +47,53 @@ namespace TCM.Api.Controllers
 
             return CreatedAtAction(nameof(GetProject), new { id = project.Id }, project);
         }
+
+        [HttpGet("{id}/summary")]
+        public async Task<ActionResult<ProjectSummaryDto>> GetProjectSummary(int id)
+        {
+            var project = await _context.Projects.FindAsync(id);
+            if (project == null) return NotFound();
+
+            var summary = new ProjectSummaryDto();
+
+            var requirements = await _context.Requirements
+                .Include(r => r.TestCaseCoverages)
+                .Where(r => r.ProjectId == id)
+                .ToListAsync();
+
+            summary.TotalRequirements = requirements.Count;
+            summary.CoveredRequirements = requirements.Count(r => r.TestCaseCoverages.Any());
+
+            var testCases = await _context.TestCases
+                .Include(tc => tc.RequirementCoverages)
+                    .ThenInclude(rc => rc.Requirement)
+                .Where(tc => tc.ProjectId == id)
+                .ToListAsync();
+
+            summary.TotalTestCases = testCases.Count;
+            summary.ActiveTestCases = testCases.Count(tc => tc.IsActive);
+
+            summary.TotalTestRuns = await _context.TestRuns.CountAsync(tr => tr.ProjectId == id);
+
+            foreach (var tc in testCases.Where(t => t.IsActive))
+            {
+                foreach (var cov in tc.RequirementCoverages)
+                {
+                    if (cov.CoveredVersion < cov.Requirement.Version)
+                    {
+                        summary.OutdatedTestCases.Add(new OutdatedCoverageDto
+                        {
+                            TestCaseExternalId = tc.ExternalId,
+                            TestCaseTitle = tc.Title,
+                            RequirementExternalId = cov.Requirement.ExternalRequirementId,
+                            CoveredVersion = cov.CoveredVersion,
+                            CurrentRequirementVersion = cov.Requirement.Version
+                        });
+                    }
+                }
+            }
+
+            return Ok(summary);
+        }
     }
 }

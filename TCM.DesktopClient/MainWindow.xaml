@@ -21,6 +21,9 @@
         <DataTemplate DataType="{x:Type viewmodels:TestRunsViewModel}">
             <views:TestRunsView/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:ProjectSummaryViewModel}">
+            <views:ProjectSummaryView/>
+        </DataTemplate>
     </Window.Resources>
 
     <ContentControl Content="{Binding CurrentView}"/>
