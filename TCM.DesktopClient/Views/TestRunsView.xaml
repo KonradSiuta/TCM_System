@@ -76,7 +76,11 @@
                         <TextBlock Text="{Binding SelectedRun.Environment, StringFormat='Environment: {0}'}" Foreground="Gray"/>
                     </StackPanel>
 
-                    <Button Content="Import Automated Results (XML)" Command="{Binding ImportResultsCommand}" HorizontalAlignment="Right" VerticalAlignment="Center" Background="#FF6F42C1" Foreground="White" BorderThickness="0" Padding="10,5"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <Button Content="Import Automated Results (XML)" Command="{Binding ImportResultsCommand}" Background="#FF6F42C1" Foreground="White" BorderThickness="0" Padding="10,5" Margin="0,0,10,0"/>
+
+                        <Button Content="Export PDF Report" Command="{Binding ExportPdfCommand}" Background="#FFDC3545" Foreground="White" BorderThickness="0" Padding="10,5" FontWeight="SemiBold"/>
+                    </StackPanel>
                 </Grid>
 
                 <DataGrid ItemsSource="{Binding SelectedRun.Executions}" AutoGenerateColumns="False" IsReadOnly="True" AlternatingRowBackground="#FFF0F0F0" Height="400">
@@ -108,5 +112,6 @@
             </StackPanel>
 
         </Grid>
+        
     </Grid>
 </UserControl>

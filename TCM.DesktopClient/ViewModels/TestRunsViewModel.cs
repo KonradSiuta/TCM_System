@@ -52,7 +52,6 @@ namespace TCM.DesktopClient.ViewModels
         public TestPriority SelectedPriorityFilter { get; set; } = TestPriority.Smoke;
         public Array Priorities => Enum.GetValues(typeof(TestPriority));
 
-        // Komendy
         public ICommand OpenCreatorCommand { get; }
         public ICommand CancelCreatorCommand { get; }
         public ICommand SelectByPriorityCommand { get; }
@@ -60,6 +59,7 @@ namespace TCM.DesktopClient.ViewModels
         public ICommand SetPassedCommand { get; }
         public ICommand SetFailedCommand { get; }
         public ICommand ImportResultsCommand { get; }
+        public ICommand ExportPdfCommand { get; }
 
         public TestRunsViewModel(Project project)
         {
@@ -82,6 +82,8 @@ namespace TCM.DesktopClient.ViewModels
             SetFailedCommand = new RelayCommand<TestExecution>(async (ex) => await UpdateStatusAsync(ex, ExecutionStatus.Failed));
             
             ImportResultsCommand = new RelayCommand(async () => await ImportResultsAsync());
+
+            ExportPdfCommand = new RelayCommand(async () => await ExportPdfReportAsync());
 
             _ = LoadRunsAsync();
             _ = LoadAvailableTestCasesAsync();
@@ -224,6 +226,46 @@ namespace TCM.DesktopClient.ViewModels
                 catch (Exception ex)
                 {
                     System.Windows.MessageBox.Show($"An error occurred:\n{ex.Message}", "Critical Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private async Task ExportPdfReportAsync()
+        {
+            if (SelectedRun == null) return;
+
+            var saveFileDialog = new Microsoft.Win32.SaveFileDialog
+            {
+                Filter = "PDF Documents (*.pdf)|*.pdf",
+                FileName = $"Report_{SelectedRun.Name.Replace(" ", "_")}.pdf",
+                Title = "Save Test Run PDF Report"
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    var response = await _httpClient.GetAsync($"api/TestRuns/{SelectedRun.Id}/pdf-report");
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        byte[] pdfBytes = await response.Content.ReadAsByteArrayAsync();
+                        await System.IO.File.WriteAllBytesAsync(saveFileDialog.FileName, pdfBytes);
+
+                        System.Windows.MessageBox.Show("PDF report generated and saved successfully!", "Success",
+                            System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        string error = await response.Content.ReadAsStringAsync();
+                        System.Windows.MessageBox.Show($"Failed to generate report:\n{error}", "Server Error",
+                            System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Windows.MessageBox.Show($"An error occurred:\n{ex.Message}", "Critical Error",
+                        System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
                 }
             }
         }

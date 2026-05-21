@@ -9,6 +9,9 @@ using TCM.Api.Data;
 using System.Xml.Linq;
 using TCM.Api.Services.Parsers;
 using TCM.Shared.Models;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
 
 namespace TCM.Api.Controllers
 {
@@ -175,6 +178,126 @@ namespace TCM.Api.Controllers
             {
                 return BadRequest($"Failed to parse the XML report: {ex.Message}");
             }
+        }
+
+        [HttpGet("{id}/pdf-report")]
+        public async Task<IActionResult> GetTestRunPdfReport(int id)
+        {
+            QuestPDF.Settings.License = LicenseType.Community;
+
+            var testRun = await _context.TestRuns
+                .Include(tr => tr.Project)
+                .Include(tr => tr.Executions)
+                    .ThenInclude(e => e.TestCase)
+                .FirstOrDefaultAsync(tr => tr.Id == id);
+
+            if (testRun == null) return NotFound("Test Run not found.");
+
+            int totalTests = testRun.Executions.Count;
+            int passedTests = testRun.Executions.Count(e => e.Status == ExecutionStatus.Passed);
+            int failedTests = testRun.Executions.Count(e => e.Status == ExecutionStatus.Failed);
+            int blockedTests = testRun.Executions.Count(e => e.Status == ExecutionStatus.Blocked);
+            int unexecutedTests = testRun.Executions.Count(e => e.Status == ExecutionStatus.Unexecuted);
+
+            double successRate = totalTests == 0 ? 0 : ((double)passedTests / totalTests) * 100;
+
+            var pdfData = Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4);
+                    page.Margin(1.5f, Unit.Centimetre);
+                    page.PageColor(Colors.White);
+                    page.DefaultTextStyle(x => x.FontFamily("Arial").FontSize(10));
+
+                    page.Header().Column(column =>
+                    {
+                        column.Item().Row(row =>
+                        {
+                            row.RelativeItem().Text($"TEST RUN REPORT").FontSize(22).Bold().FontColor("#007ACC");
+
+                            row.ConstantItem(100).AlignRight().Text($"TCM SYSTEM").FontSize(10).Bold().FontColor(Colors.Grey.Medium);
+                        });
+
+                        column.Item().PaddingTop(5).LineHorizontal(1).LineColor("#007ACC");
+                    });
+
+                    page.Content().PaddingTop(1, Unit.Centimetre).Column(col =>
+                    {
+                        col.Item().Grid(grid =>
+                        {
+                            grid.Columns(2);
+                            grid.Item().Text(t => { t.Span("Project: ").Bold(); t.Span(testRun.Project?.Name ?? "N/A"); });
+                            grid.Item().Text(t => { t.Span("Created At: ").Bold(); t.Span(testRun.CreatedAt.ToString("g")); });
+                            grid.Item().Text(t => { t.Span("Test Cycle: ").Bold(); t.Span(testRun.Name); });
+                            grid.Item().Text(t => { t.Span("Environment: ").Bold(); t.Span(testRun.Environment); });
+                        });
+
+                        col.Item().PaddingTop(20);
+
+                        col.Item().Background(Colors.Grey.Lighten4).Padding(10).Border(1).BorderColor(Colors.Grey.Lighten2).Grid(grid =>
+                        {
+                            grid.Columns(5);
+
+                            grid.Item().Column(c => { c.Item().AlignCenter().Text("Total").Bold(); c.Item().AlignCenter().Text(totalTests.ToString()).FontSize(16).Bold(); });
+                            grid.Item().Column(c => { c.Item().AlignCenter().Text("Passed").Bold(); c.Item().AlignCenter().Text(passedTests.ToString()).FontSize(16).Bold().FontColor(Colors.Green.Medium); });
+                            grid.Item().Column(c => { c.Item().AlignCenter().Text("Failed").Bold(); c.Item().AlignCenter().Text(failedTests.ToString()).FontSize(16).Bold().FontColor(Colors.Red.Medium); });
+                            grid.Item().Column(c => { c.Item().AlignCenter().Text("Blocked").Bold(); c.Item().AlignCenter().Text(blockedTests.ToString()).FontSize(16).Bold().FontColor(Colors.Amber.Medium); });
+                            grid.Item().Column(c => { c.Item().AlignCenter().Text("Success Rate").Bold(); c.Item().AlignCenter().Text($"{successRate:F1}%").FontSize(16).Bold().FontColor("#007ACC"); });
+                        });
+
+                        col.Item().PaddingTop(25);
+                        col.Item().Text("Detailed Execution Results").FontSize(14).Bold().FontColor("#333333");
+                        col.Item().PaddingTop(5);
+
+                        col.Item().Table(table =>
+                        {
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.ConstantColumn(60);
+                                columns.RelativeColumn(3);
+                                columns.ConstantColumn(80);
+                                columns.ConstantColumn(80);
+                                columns.RelativeColumn(2);
+                            });
+
+                            table.Header(header =>
+                            {
+                                header.Cell().Background("#007ACC").Padding(5).Text("Test ID").Bold().FontColor(Colors.White);
+                                header.Cell().Background("#007ACC").Padding(5).Text("Title").Bold().FontColor(Colors.White);
+                                header.Cell().Background("#007ACC").Padding(5).Text("Mode").Bold().FontColor(Colors.White);
+                                header.Cell().Background("#007ACC").Padding(5).Text("Status").Bold().FontColor(Colors.White);
+                                header.Cell().Background("#007ACC").Padding(5).Text("Notes").Bold().FontColor(Colors.White);
+                            });
+
+                            foreach (var exec in testRun.Executions)
+                            {
+                                string statusText = exec.Status.ToString();
+                                string statusColor = exec.Status == ExecutionStatus.Passed ? "#28A745" :
+                                                     exec.Status == ExecutionStatus.Failed ? "#DC3545" :
+                                                     exec.Status == ExecutionStatus.Blocked ? "#FFC107" : "#6C757D";
+
+                                table.Cell().BorderBottom(0.5f).BorderColor(Colors.Grey.Lighten2).Padding(5).Text(exec.TestCase?.ExternalId ?? "N/A");
+                                table.Cell().BorderBottom(0.5f).BorderColor(Colors.Grey.Lighten2).Padding(5).Text(exec.TestCase?.Title ?? "N/A");
+                                table.Cell().BorderBottom(0.5f).BorderColor(Colors.Grey.Lighten2).Padding(5).Text(exec.Mode.ToString());
+                                table.Cell().BorderBottom(0.5f).BorderColor(Colors.Grey.Lighten2).Padding(5).Text(statusText).Bold().FontColor(statusColor);
+                                table.Cell().BorderBottom(0.5f).BorderColor(Colors.Grey.Lighten2).Padding(5).Text(string.IsNullOrWhiteSpace(exec.Notes) ? "-" : exec.Notes).FontSize(9);
+                            }
+                        });
+                    });
+
+                    page.Footer().AlignRight().Text(x =>
+                    {
+                        x.Span("Page ");
+                        x.CurrentPageNumber();
+                        x.Span(" of ");
+                        x.TotalPages();
+                    });
+                });
+            }).GeneratePdf();
+
+            string safeFileName = $"Report_{testRun.Name.Replace(" ", "_")}.pdf";
+            return File(pdfData, "application/pdf", safeFileName);
         }
     }
 }
