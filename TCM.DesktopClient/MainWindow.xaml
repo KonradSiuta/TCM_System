@@ -24,6 +24,9 @@
         <DataTemplate DataType="{x:Type viewmodels:ProjectSummaryViewModel}">
             <views:ProjectSummaryView/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:TeamViewModel}">
+            <views:TeamView/>
+        </DataTemplate>
     </Window.Resources>
 
     <ContentControl Content="{Binding CurrentView}"/>

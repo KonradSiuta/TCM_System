@@ -19,6 +19,7 @@
                 <Button Content="Requirements" Command="{Binding ShowRequirementsCommand}" Width="120" Background="#FF007ACC" Foreground="White" BorderThickness="0" Padding="8" Margin="0,0,10,0"/>
                 <Button Content="Test Cases" Command="{Binding ShowTestCasesCommand}" Width="120" Background="#FF007ACC" Foreground="White" BorderThickness="0" Padding="8" Margin="0,0,10,0"/>
                 <Button Content="Test Runs" Command="{Binding ShowTestRunsCommand}" Width="120" Background="#FF007ACC" Foreground="White" BorderThickness="0" Padding="8" Margin="0,0,10,0"/>
+                <Button Content="Team" Command="{Binding ShowTeamCommand}" Width="100" Background="#FF007ACC" Foreground="White" BorderThickness="0" Padding="8" Margin="0,0,10,0"/>
             </StackPanel>
         </Border>
 
