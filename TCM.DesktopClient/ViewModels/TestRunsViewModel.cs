@@ -46,6 +46,13 @@ namespace TCM.DesktopClient.ViewModels
             set { _isAdmin = value; OnPropertyChanged(nameof(IsAdmin)); }
         }
 
+        private bool _canExecute;
+        public bool CanExecute
+        {
+            get => _canExecute;
+            set { _canExecute = value; OnPropertyChanged(nameof(CanExecute)); }
+        }
+
         private bool _isEditingRun;
         public bool IsEditingRun
         {
@@ -330,11 +337,26 @@ namespace TCM.DesktopClient.ViewModels
                 var response = await _httpClient.GetAsync($"api/ProjectMembers/Project/{CurrentProject.Id}/MyRole");
                 if (response.IsSuccessStatusCode)
                 {
-                    var role = await response.Content.ReadFromJsonAsync<ProjectRole>();
-                    IsAdmin = (role == ProjectRole.Administrator);
+                    var rawContent = await response.Content.ReadAsStringAsync();
+                    if (int.TryParse(rawContent, out int roleValue))
+                    {
+                        IsAdmin = (roleValue == (int)ProjectRole.Administrator);
+
+                        CanExecute = (roleValue == (int)ProjectRole.Administrator || roleValue == (int)ProjectRole.Tester);
+                    }
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    System.Windows.MessageBox.Show($"Serwer odrzucił żądanie pobrania roli.\nStatus: {response.StatusCode}\nTreść: {error}", "Debug Info", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
                 }
             }
-            catch { IsAdmin = false; }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show($"Wyjątek podczas łączenia z API w LoadMyRoleAsync:\n{ex.Message}", "Debug Info", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                IsAdmin = false;
+                CanExecute = false;
+            }
         }
 
         private async Task SaveEditAsync()

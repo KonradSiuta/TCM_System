@@ -13,7 +13,7 @@
 
         <Border Grid.Column="0" BorderBrush="#DDDDDD" BorderThickness="0,0,1,0" Margin="0,0,15,0" Padding="0,0,15,0">
             <StackPanel>
-                <Button Content="+ Create New Run" Command="{Binding OpenCreatorCommand}" Background="#FF007ACC" Foreground="White" BorderThickness="0" Padding="10" Margin="0,0,0,15" FontWeight="Bold"/>
+                <Button Content="+ Create New Run" Command="{Binding OpenCreatorCommand}" IsEnabled="{Binding IsAdmin}" Background="#FF007ACC" Foreground="White" BorderThickness="0" Padding="10" Margin="0,0,0,15" FontWeight="Bold"/>
 
                 <TextBlock Text="History" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
                 <ListBox ItemsSource="{Binding TestRuns}" SelectedItem="{Binding SelectedRun}" DisplayMemberPath="Name" BorderThickness="0" MinHeight="300" Background="Transparent"/>
@@ -102,7 +102,7 @@
                         </StackPanel>
 
                         <WrapPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
-                            <Button Content="Import Automated Results (XML)" Command="{Binding ImportResultsCommand}" Background="#FF6F42C1" Foreground="White" BorderThickness="0" Padding="10,5" Margin="0,0,5,5"/>
+                            <Button Content="Import Automated Results (XML)" Command="{Binding ImportResultsCommand}" IsEnabled="{Binding CanExecute}" Background="#FF6F42C1" Foreground="White" BorderThickness="0" Padding="10,5" Margin="0,0,5,5"/>
                             <Button Content="Export PDF Report" Command="{Binding ExportPdfCommand}" Background="#FFDC3545" Foreground="White" BorderThickness="0" Padding="10,5" Margin="0,0,0,5" FontWeight="SemiBold"/>
                         </WrapPanel>
                     </Grid>
@@ -123,8 +123,8 @@
                                     </Style.Triggers>
                                 </Style>
                             </StackPanel.Style>
-                            <Button Content="Edit Details" Command="{Binding StartEditCommand}" Background="#FF17A2B8" Foreground="White" BorderThickness="0" Padding="10,4" Margin="0,0,10,0"/>
-                            <Button Content="Delete Run" Command="{Binding DeleteRunCommand}" Background="#FFDC3545" Foreground="White" BorderThickness="0" Padding="10,4"/>
+                            <Button Content="Edit Details" Command="{Binding StartEditCommand}" IsEnabled="{Binding IsAdmin}" Background="#FF17A2B8" Foreground="White" BorderThickness="0" Padding="10,4" Margin="0,0,10,0"/>
+                            <Button Content="Delete Run" Command="{Binding DeleteRunCommand}" IsEnabled="{Binding IsAdmin}" Background="#FFDC3545" Foreground="White" BorderThickness="0" Padding="10,4"/>
                         </StackPanel>
 
                         <Border Background="#FFFFE8A1" Padding="10" CornerRadius="5">
@@ -173,8 +173,13 @@
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-                                        <Button Content="Pass" Command="{Binding DataContext.SetPassedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Background="#FF28A745" Foreground="White" BorderThickness="0" Padding="5,2" Margin="0,0,5,0" Width="60"/>
-                                        <Button Content="Fail" Command="{Binding DataContext.SetFailedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Background="#FFDC3545" Foreground="White" BorderThickness="0" Padding="5,2" Width="60"/>
+                                        <Button Content="Pass" Command="{Binding DataContext.SetPassedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
+                                                IsEnabled="{Binding DataContext.CanExecute, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
+                                                CommandParameter="{Binding}" Background="#FF28A745" Foreground="White" BorderThickness="0" Padding="5,2" Margin="0,0,5,0" Width="60"/>
+
+                                        <Button Content="Fail" Command="{Binding DataContext.SetFailedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
+                                                IsEnabled="{Binding DataContext.CanExecute, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
+                                                CommandParameter="{Binding}" Background="#FFDC3545" Foreground="White" BorderThickness="0" Padding="5,2" Width="60"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>

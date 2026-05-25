@@ -25,6 +25,13 @@ namespace TCM.DesktopClient.ViewModels
             set { _selectedSystemUser = value; OnPropertyChanged(nameof(SelectedSystemUser)); }
         }
 
+        private bool _isAdmin;
+        public bool IsAdmin
+        {
+            get => _isAdmin;
+            set { _isAdmin = value; OnPropertyChanged(nameof(IsAdmin)); }
+        }
+
         public ProjectRole SelectedRole { get; set; } = ProjectRole.Tester;
         public Array AvailableRoles => Enum.GetValues(typeof(ProjectRole));
 
@@ -43,6 +50,7 @@ namespace TCM.DesktopClient.ViewModels
 
             _ = LoadMembersAsync();
             _ = LoadSystemUsersAsync();
+            _ = LoadMyRoleAsync();
         }
 
         private async Task LoadMembersAsync()
@@ -122,6 +130,26 @@ namespace TCM.DesktopClient.ViewModels
             catch (Exception ex)
             {
                 System.Windows.MessageBox.Show($"Failed to load system users: {ex.Message}");
+            }
+        }
+
+        private async Task LoadMyRoleAsync()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/ProjectMembers/Project/{CurrentProject.Id}/MyRole");
+                if (response.IsSuccessStatusCode)
+                {
+                    var rawContent = await response.Content.ReadAsStringAsync();
+                    if (int.TryParse(rawContent, out int roleValue))
+                    {
+                        IsAdmin = (roleValue == (int)ProjectRole.Administrator);
+                    }
+                }
+            }
+            catch
+            {
+                IsAdmin = false;
             }
         }
 

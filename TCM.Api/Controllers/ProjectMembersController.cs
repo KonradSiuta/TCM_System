@@ -43,11 +43,17 @@ namespace TCM.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> UpsertProjectMember(UpsertMemberDto dto)
         {
+            var callerIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(callerIdStr, out int callerId)) return Unauthorized();
+
+            var callerMember = await _context.ProjectMembers.FirstOrDefaultAsync(pm => pm.ProjectId == dto.ProjectId && pm.UserId == callerId);
+            if (callerMember == null || callerMember.Role != ProjectRole.Administrator)
+                return StatusCode(403, "Only Administrators can modify the team.");
+
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == dto.Username);
             if (user == null) return NotFound($"User '{dto.Username}' does not exist in the system.");
 
-            var existingMember = await _context.ProjectMembers
-                .FirstOrDefaultAsync(pm => pm.ProjectId == dto.ProjectId && pm.UserId == user.Id);
+            var existingMember = await _context.ProjectMembers.FirstOrDefaultAsync(pm => pm.ProjectId == dto.ProjectId && pm.UserId == user.Id);
 
             if (existingMember != null)
             {
@@ -57,12 +63,7 @@ namespace TCM.Api.Controllers
             }
             else
             {
-                var newMember = new ProjectMember
-                {
-                    ProjectId = dto.ProjectId,
-                    UserId = user.Id,
-                    Role = dto.Role
-                };
+                var newMember = new ProjectMember { ProjectId = dto.ProjectId, UserId = user.Id, Role = dto.Role };
                 _context.ProjectMembers.Add(newMember);
                 await _context.SaveChangesAsync();
                 return Ok($"User '{dto.Username}' added to the project as {dto.Role}.");
@@ -72,9 +73,14 @@ namespace TCM.Api.Controllers
         [HttpDelete("Project/{projectId}/User/{userId}")]
         public async Task<IActionResult> RemoveMember(int projectId, int userId)
         {
-            var member = await _context.ProjectMembers
-                .FirstOrDefaultAsync(pm => pm.ProjectId == projectId && pm.UserId == userId);
+            var callerIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(callerIdStr, out int callerId)) return Unauthorized();
 
+            var callerMember = await _context.ProjectMembers.FirstOrDefaultAsync(pm => pm.ProjectId == projectId && pm.UserId == callerId);
+            if (callerMember == null || callerMember.Role != ProjectRole.Administrator)
+                return StatusCode(403, "Only Administrators can remove team members.");
+
+            var member = await _context.ProjectMembers.FirstOrDefaultAsync(pm => pm.ProjectId == projectId && pm.UserId == userId);
             if (member == null) return NotFound();
 
             _context.ProjectMembers.Remove(member);

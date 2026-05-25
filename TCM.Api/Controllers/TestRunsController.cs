@@ -52,6 +52,16 @@ namespace TCM.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<TestRun>> CreateTestRun(CreateTestRunDto dto)
         {
+            var callerIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(callerIdStr, out int callerId)) return Unauthorized();
+
+            var member = await _context.ProjectMembers.FirstOrDefaultAsync(pm => pm.ProjectId == dto.ProjectId && pm.UserId == callerId);
+            if (member == null || member.Role != ProjectRole.Administrator)
+                return StatusCode(403, "Only Administrators can create Test Runs.");
+
+            if (dto.TestCaseIds == null || !dto.TestCaseIds.Any())
+                return BadRequest("You must select at least one test case.");
+
             if (dto.TestCaseIds == null || !dto.TestCaseIds.Any())
                 return BadRequest("You must select at least one test case.");
 
@@ -90,8 +100,17 @@ namespace TCM.Api.Controllers
         [HttpPatch("Execution/{executionId}/status")]
         public async Task<IActionResult> UpdateExecutionStatus(int executionId, [FromBody] ExecutionStatus status)
         {
-            var execution = await _context.TestExecutions.FindAsync(executionId);
+            var execution = await _context.TestExecutions
+                .Include(e => e.TestRun)
+                .FirstOrDefaultAsync(e => e.Id == executionId);
             if (execution == null) return NotFound();
+
+            var callerIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(callerIdStr, out int callerId)) return Unauthorized();
+
+            var member = await _context.ProjectMembers.FirstOrDefaultAsync(pm => pm.ProjectId == execution.TestRun.ProjectId && pm.UserId == callerId);
+            if (member == null || member.Role == ProjectRole.Viewer)
+                return StatusCode(403, "Viewers cannot modify execution status.");
 
             execution.Status = status;
             execution.ExecutedAt = DateTime.UtcNow;
@@ -110,6 +129,15 @@ namespace TCM.Api.Controllers
 
             if (testRun == null) return NotFound("Test Run not found.");
             if (file == null || file.Length == 0) return BadRequest("File is empty.");
+
+            var callerIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (int.TryParse(callerIdStr, out int callerId))
+            {
+                var member = await _context.ProjectMembers.FirstOrDefaultAsync(pm => pm.ProjectId == testRun.ProjectId && pm.UserId == callerId);
+                if (member == null || member.Role == ProjectRole.Viewer)
+                    return StatusCode(403, "Viewers cannot import test results.");
+            }
+            else return Unauthorized();
 
             var project = await _context.Projects.FindAsync(testRun.ProjectId);
             if (project == null) return NotFound("Project not found.");
