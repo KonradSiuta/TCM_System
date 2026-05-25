@@ -39,6 +39,23 @@ namespace TCM.DesktopClient.ViewModels
             }
         }
 
+        private bool _isAdmin;
+        public bool IsAdmin
+        {
+            get => _isAdmin;
+            set { _isAdmin = value; OnPropertyChanged(nameof(IsAdmin)); }
+        }
+
+        private bool _isEditingRun;
+        public bool IsEditingRun
+        {
+            get => _isEditingRun;
+            set { _isEditingRun = value; OnPropertyChanged(nameof(IsEditingRun)); }
+        }
+
+        public string EditRunName { get; set; }
+        public string EditRunEnvironment { get; set; }
+
         private bool _isCreatingNew;
         public bool IsCreatingNew
         {
@@ -48,6 +65,20 @@ namespace TCM.DesktopClient.ViewModels
 
         public string NewRunName { get; set; } = "Sprint 1 Run";
         public string NewRunEnvironment { get; set; } = "QA Environment";
+
+        private DateTime? _newRunPlannedEndDate;
+        public DateTime? NewRunPlannedEndDate
+        {
+            get => _newRunPlannedEndDate;
+            set { _newRunPlannedEndDate = value; OnPropertyChanged(nameof(NewRunPlannedEndDate)); }
+        }
+
+        private DateTime? _editRunPlannedEndDate;
+        public DateTime? EditRunPlannedEndDate
+        {
+            get => _editRunPlannedEndDate;
+            set { _editRunPlannedEndDate = value; OnPropertyChanged(nameof(EditRunPlannedEndDate)); }
+        }
 
         public TestPriority SelectedPriorityFilter { get; set; } = TestPriority.Smoke;
         public Array Priorities => Enum.GetValues(typeof(TestPriority));
@@ -60,6 +91,10 @@ namespace TCM.DesktopClient.ViewModels
         public ICommand SetFailedCommand { get; }
         public ICommand ImportResultsCommand { get; }
         public ICommand ExportPdfCommand { get; }
+        public ICommand StartEditCommand { get; }
+        public ICommand CancelEditCommand { get; }
+        public ICommand SaveEditCommand { get; }
+        public ICommand DeleteRunCommand { get; }
 
         public TestRunsViewModel(Project project)
         {
@@ -71,6 +106,7 @@ namespace TCM.DesktopClient.ViewModels
             OpenCreatorCommand = new RelayCommand(() =>
             {
                 SelectedRun = null;
+                NewRunPlannedEndDate = null;
                 IsCreatingNew = true;
             });
             CancelCreatorCommand = new RelayCommand(() => IsCreatingNew = false);
@@ -84,6 +120,22 @@ namespace TCM.DesktopClient.ViewModels
             ImportResultsCommand = new RelayCommand(async () => await ImportResultsAsync());
 
             ExportPdfCommand = new RelayCommand(async () => await ExportPdfReportAsync());
+
+            StartEditCommand = new RelayCommand(() => 
+            { 
+                EditRunName = SelectedRun.Name; 
+                EditRunEnvironment = SelectedRun.Environment;
+                EditRunPlannedEndDate = SelectedRun.PlannedEndDate;
+                OnPropertyChanged(nameof(EditRunName));
+                OnPropertyChanged(nameof(EditRunEnvironment));
+                OnPropertyChanged(nameof(EditRunPlannedEndDate));
+                IsEditingRun = true; 
+            });
+            CancelEditCommand = new RelayCommand(() => IsEditingRun = false);
+            SaveEditCommand = new RelayCommand(async () => await SaveEditAsync());
+            DeleteRunCommand = new RelayCommand(async () => await DeleteRunAsync());
+
+            _ = LoadMyRoleAsync();
 
             _ = LoadRunsAsync();
             _ = LoadAvailableTestCasesAsync();
@@ -164,6 +216,7 @@ namespace TCM.DesktopClient.ViewModels
                 ProjectId = CurrentProject.Id,
                 Name = NewRunName,
                 Environment = NewRunEnvironment,
+                PlannedEndDate = NewRunPlannedEndDate,
                 TestCaseIds = selectedIds
             };
 
@@ -266,6 +319,64 @@ namespace TCM.DesktopClient.ViewModels
                 {
                     System.Windows.MessageBox.Show($"An error occurred:\n{ex.Message}", "Critical Error",
                         System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private async Task LoadMyRoleAsync()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/ProjectMembers/Project/{CurrentProject.Id}/MyRole");
+                if (response.IsSuccessStatusCode)
+                {
+                    var role = await response.Content.ReadFromJsonAsync<ProjectRole>();
+                    IsAdmin = (role == ProjectRole.Administrator);
+                }
+            }
+            catch { IsAdmin = false; }
+        }
+
+        private async Task SaveEditAsync()
+        {
+            if (SelectedRun == null) return;
+
+            var dto = new UpdateTestRunDto {
+                Name = EditRunName,
+                Environment = EditRunEnvironment,
+                PlannedEndDate = EditRunPlannedEndDate 
+            };
+            var response = await _httpClient.PutAsJsonAsync($"api/TestRuns/{SelectedRun.Id}", dto);
+
+            if (response.IsSuccessStatusCode)
+            {
+                IsEditingRun = false;
+                await LoadRunsAsync();
+                await LoadRunDetailsAsync();
+            }
+            else
+            {
+                System.Windows.MessageBox.Show("Failed to update test run. Access Denied?", "Error");
+            }
+        }
+
+        private async Task DeleteRunAsync()
+        {
+            if (SelectedRun == null) return;
+
+            var result = System.Windows.MessageBox.Show($"Are you sure you want to permanently delete test run: {SelectedRun.Name}?", "Warning", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Warning);
+
+            if (result == System.Windows.MessageBoxResult.Yes)
+            {
+                var response = await _httpClient.DeleteAsync($"api/TestRuns/{SelectedRun.Id}");
+                if (response.IsSuccessStatusCode)
+                {
+                    SelectedRun = null;
+                    await LoadRunsAsync();
+                }
+                else
+                {
+                    System.Windows.MessageBox.Show("Failed to delete test run. Access Denied?", "Error");
                 }
             }
         }

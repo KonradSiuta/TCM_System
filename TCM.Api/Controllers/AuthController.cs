@@ -26,7 +26,7 @@ namespace TCM.Api.Controllers
         public async Task<IActionResult> Register(UserRegisterDto request)
         {
             if (await _context.Users.AnyAsync(u => u.Username == request.Username))
-                return BadRequest("Użytkownik o takiej nazwie już istnieje.");
+                return BadRequest("This username is already taken.");
 
             var user = new User
             {
@@ -38,7 +38,7 @@ namespace TCM.Api.Controllers
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return Ok("Rejestracja przebiegła pomyślnie.");
+            return Ok("Registration completed.");
         }
 
         [HttpPost("login")]
@@ -47,7 +47,7 @@ namespace TCM.Api.Controllers
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
-                return Unauthorized("Nieprawidłowa nazwa użytkownika lub hasło.");
+                return Unauthorized("Invalid username or/and password.");
 
             string token = CreateToken(user);
 

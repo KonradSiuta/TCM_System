@@ -25,12 +25,16 @@
             <StackPanel Visibility="{Binding IsCreatingNew, Converter={StaticResource BoolToVis}}">
                 <TextBlock Text="Create New Test Run" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
 
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
-                    <TextBlock Text="Name:" Width="50" VerticalAlignment="Center"/>
-                    <TextBox Text="{Binding NewRunName}" Width="200" Margin="0,0,20,0" Padding="5"/>
-                    <TextBlock Text="Environment:" Width="80" VerticalAlignment="Center"/>
-                    <TextBox Text="{Binding NewRunEnvironment}" Width="200" Padding="5"/>
-                </StackPanel>
+                <WrapPanel Orientation="Horizontal" Margin="0,0,0,15">
+                    <TextBlock Text="Name:" Width="50" VerticalAlignment="Center" Margin="0,0,0,5"/>
+                    <TextBox Text="{Binding NewRunName}" Width="150" Margin="0,0,15,5" Padding="5"/>
+
+                    <TextBlock Text="Environment:" Width="80" VerticalAlignment="Center" Margin="0,0,0,5"/>
+                    <TextBox Text="{Binding NewRunEnvironment}" Width="150" Margin="0,0,15,5" Padding="5"/>
+
+                    <TextBlock Text="Planned End Date:" Width="100" VerticalAlignment="Center" Margin="0,0,0,5"/>
+                    <DatePicker SelectedDate="{Binding NewRunPlannedEndDate}" Width="120" Margin="0,0,0,5"/>
+                </WrapPanel>
 
                 <Border Background="#FFEAEAEA" Padding="10" Margin="0,0,0,10" CornerRadius="5">
                     <StackPanel Orientation="Horizontal">
@@ -55,6 +59,7 @@
                 </StackPanel>
             </StackPanel>
 
+
             <StackPanel>
                 <StackPanel.Style>
                     <Style TargetType="StackPanel">
@@ -70,18 +75,85 @@
                     </Style>
                 </StackPanel.Style>
 
-                <Grid Margin="0,0,0,15">
+                <StackPanel Margin="0,0,0,15">
+
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,10,0">
+                            <TextBlock Text="{Binding SelectedRun.Name}" FontSize="18" FontWeight="Bold" Margin="0,0,0,5" TextWrapping="Wrap"/>
+                            <TextBlock Text="{Binding SelectedRun.Environment, StringFormat='Environment: {0}'}" Foreground="Gray" TextWrapping="Wrap"/>
+
+                            <TextBlock Text="{Binding SelectedRun.PlannedEndDate, StringFormat='Deadline: {0:yyyy-MM-dd}'}" Foreground="#FF17A2B8" FontWeight="SemiBold" Margin="0,5,0,0" TextWrapping="Wrap">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SelectedRun.PlannedEndDate}" Value="{x:Null}">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+
+                        <WrapPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                            <Button Content="Import Automated Results (XML)" Command="{Binding ImportResultsCommand}" Background="#FF6F42C1" Foreground="White" BorderThickness="0" Padding="10,5" Margin="0,0,5,5"/>
+                            <Button Content="Export PDF Report" Command="{Binding ExportPdfCommand}" Background="#FFDC3545" Foreground="White" BorderThickness="0" Padding="10,5" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                        </WrapPanel>
+                    </Grid>
+
                     <StackPanel>
-                        <TextBlock Text="{Binding SelectedRun.Name}" FontSize="18" FontWeight="Bold" Margin="0,0,0,5"/>
-                        <TextBlock Text="{Binding SelectedRun.Environment, StringFormat='Environment: {0}'}" Foreground="Gray"/>
-                    </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding IsAdmin}" Value="True"/>
+                                                <Condition Binding="{Binding IsEditingRun}" Value="False"/>
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </MultiDataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+                            <Button Content="Edit Details" Command="{Binding StartEditCommand}" Background="#FF17A2B8" Foreground="White" BorderThickness="0" Padding="10,4" Margin="0,0,10,0"/>
+                            <Button Content="Delete Run" Command="{Binding DeleteRunCommand}" Background="#FFDC3545" Foreground="White" BorderThickness="0" Padding="10,4"/>
+                        </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                        <Button Content="Import Automated Results (XML)" Command="{Binding ImportResultsCommand}" Background="#FF6F42C1" Foreground="White" BorderThickness="0" Padding="10,5" Margin="0,0,10,0"/>
+                        <Border Background="#FFFFE8A1" Padding="10" CornerRadius="5">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsEditingRun}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <WrapPanel Orientation="Horizontal">
+                                <TextBlock Text="Name:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding EditRunName}" Width="150" Padding="3" Margin="0,0,15,5"/>
 
-                        <Button Content="Export PDF Report" Command="{Binding ExportPdfCommand}" Background="#FFDC3545" Foreground="White" BorderThickness="0" Padding="10,5" FontWeight="SemiBold"/>
+                                <TextBlock Text="Environment:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,5,0"/>
+                                <TextBox Text="{Binding EditRunEnvironment}" Width="150" Padding="3" Margin="0,0,15,5"/>
+
+                                <TextBlock Text="New End Date:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,5,0"/>
+                                <DatePicker SelectedDate="{Binding EditRunPlannedEndDate}" Width="120" Padding="3" Margin="0,0,15,5"/>
+
+                                <Button Content="Save" Command="{Binding SaveEditCommand}" Background="#FF28A745" Foreground="White" BorderThickness="0" Padding="10,2" Margin="0,0,5,5"/>
+                                <Button Content="Cancel" Command="{Binding CancelEditCommand}" Background="#FF6C757D" Foreground="White" BorderThickness="0" Padding="10,2" Margin="0,0,0,5"/>
+                            </WrapPanel>
+                        </Border>
                     </StackPanel>
-                </Grid>
+                </StackPanel>
 
                 <DataGrid ItemsSource="{Binding SelectedRun.Executions}" AutoGenerateColumns="False" IsReadOnly="True" AlternatingRowBackground="#FFF0F0F0" Height="400">
                     <DataGrid.Columns>
@@ -112,6 +184,5 @@
             </StackPanel>
 
         </Grid>
-        
     </Grid>
 </UserControl>

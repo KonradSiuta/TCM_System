@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Security.Claims;
 using TCM.Api.Data;
 using TCM.Shared.Models;
 
@@ -80,6 +81,19 @@ namespace TCM.Api.Controllers
             await _context.SaveChangesAsync();
 
             return Ok();
+        }
+
+        [HttpGet("Project/{projectId}/MyRole")]
+        public async Task<ActionResult<ProjectRole>> GetMyRole(int projectId)
+        {
+            var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(userIdStr, out int userId)) return Unauthorized();
+
+            var member = await _context.ProjectMembers.FirstOrDefaultAsync(pm => pm.ProjectId == projectId && pm.UserId == userId);
+
+            if (member == null) return NotFound("User is not a member of this project.");
+
+            return Ok(member.Role);
         }
     }
 }

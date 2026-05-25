@@ -1,17 +1,18 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using TCM.Api.Data;
-using System.Xml.Linq;
-using TCM.Api.Services.Parsers;
-using TCM.Shared.Models;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using System.Xml.Linq;
+using TCM.Api.Data;
+using TCM.Api.Services.Parsers;
+using TCM.Shared.Models;
 
 namespace TCM.Api.Controllers
 {
@@ -59,6 +60,7 @@ namespace TCM.Api.Controllers
                 ProjectId = dto.ProjectId,
                 Name = dto.Name,
                 Environment = dto.Environment,
+                PlannedEndDate = dto.PlannedEndDate,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -178,6 +180,44 @@ namespace TCM.Api.Controllers
             {
                 return BadRequest($"Failed to parse the XML report: {ex.Message}");
             }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateTestRun(int id, [FromBody] UpdateTestRunDto dto)
+        {
+            var testRun = await _context.TestRuns.FindAsync(id);
+            if (testRun == null) return NotFound();
+
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var member = await _context.ProjectMembers.FirstOrDefaultAsync(pm => pm.ProjectId == testRun.ProjectId && pm.UserId == userId);
+
+            if (member == null || member.Role != ProjectRole.Administrator)
+                return StatusCode(403, "Only Administrators can modify Test Runs.");
+
+            testRun.Name = dto.Name;
+            testRun.Environment = dto.Environment;
+            testRun.PlannedEndDate = dto.PlannedEndDate;
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteTestRun(int id)
+        {
+            var testRun = await _context.TestRuns.FindAsync(id);
+            if (testRun == null) return NotFound();
+
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var member = await _context.ProjectMembers.FirstOrDefaultAsync(pm => pm.ProjectId == testRun.ProjectId && pm.UserId == userId);
+
+            if (member == null || member.Role != ProjectRole.Administrator)
+                return StatusCode(403, "Only Administrators can delete Test Runs.");
+
+            _context.TestRuns.Remove(testRun);
+            await _context.SaveChangesAsync();
+
+            return Ok();
         }
 
         [HttpGet("{id}/pdf-report")]
