@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TCM.Api.Data;
 using TCM.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace TCM.Api.Controllers
 {
@@ -21,28 +22,53 @@ namespace TCM.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Project>>> GetProjects()
         {
-            return await _context.Projects.ToListAsync();
+            var callerIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(callerIdStr, out int callerId)) return Unauthorized();
+
+            var projects = await _context.Projects
+                .Where(p => p.Members.Any(pm => pm.UserId == callerId))
+                .ToListAsync();
+
+            return Ok(projects);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Project>> GetProject(int id)
         {
-            var project = await _context.Projects.FindAsync(id);
+            var callerIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(callerIdStr, out int callerId)) return Unauthorized();
 
-            if (project == null)
-            {
-                return NotFound();
-            }
+            var project = await _context.Projects
+                .Include(p => p.Members)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
-            return project;
+            if (project == null) return NotFound();
+
+            if (!project.Members.Any(pm => pm.UserId == callerId))
+                return StatusCode(403, "You do not have access to this project.");
+
+            return Ok(project);
         }
 
         [HttpPost]
         public async Task<ActionResult<Project>> CreateProject(Project project)
         {
+            var callerIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(callerIdStr, out int callerId)) return Unauthorized();
+
             project.CreatedAt = DateTime.UtcNow;
 
             _context.Projects.Add(project);
+            await _context.SaveChangesAsync();
+
+            var member = new ProjectMember
+            {
+                ProjectId = project.Id,
+                UserId = callerId,
+                Role = ProjectRole.Administrator
+            };
+
+            _context.ProjectMembers.Add(member);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetProject), new { id = project.Id }, project);
@@ -51,8 +77,17 @@ namespace TCM.Api.Controllers
         [HttpGet("{id}/summary")]
         public async Task<ActionResult<ProjectSummaryDto>> GetProjectSummary(int id)
         {
-            var project = await _context.Projects.FindAsync(id);
+            var callerIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(callerIdStr, out int callerId)) return Unauthorized();
+
+            var project = await _context.Projects
+                .Include(p => p.Members)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
             if (project == null) return NotFound();
+
+            if (!project.Members.Any(pm => pm.UserId == callerId))
+                return StatusCode(403, "You do not have access to this project's dashboard.");
 
             var summary = new ProjectSummaryDto();
 

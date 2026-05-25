@@ -5,7 +5,7 @@
         WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
     <Grid>
         <StackPanel VerticalAlignment="Center">
-            <TextBlock Text="Załóż nowe konto" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+            <TextBlock Text="Create new account" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20"/>
 
             <TextBlock Text="Username:" Margin="0,0,0,5" FontWeight="SemiBold"/>
             <TextBox x:Name="UsernameTxt" Margin="0,0,0,10" Padding="5"/>
@@ -23,7 +23,7 @@
 
             <Button x:Name="RegisterBtn" Content="Create account" Padding="10" Background="#FF28A745" Foreground="White" BorderThickness="0" Click="RegisterButton_Click"/>
 
-            <Button Content="Sing in" Background="Transparent" Foreground="#FF007ACC" BorderThickness="0" Margin="0,15,0,0" Click="BackToLogin_Click"/>
+            <Button Content="Sign in" Background="Transparent" Foreground="#FF007ACC" BorderThickness="0" Margin="0,15,0,0" Click="BackToLogin_Click"/>
         </StackPanel>
     </Grid>
 </Window>
