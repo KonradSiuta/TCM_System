@@ -8,28 +8,29 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
-            <Button Content="Import from Source Code" Command="{Binding ImportSourceCommand}" Width="180" Background="#FF17A2B8" Foreground="White" BorderThickness="0" Padding="8"/>
+            <Button Content="Import from Source Code" Command="{Binding ImportSourceCommand}" IsEnabled="{Binding CanEdit}" Width="180" Background="#FF17A2B8" Foreground="White" BorderThickness="0" Padding="8"/>
         </StackPanel>
 
         <DataGrid Grid.Row="1" ItemsSource="{Binding TestCases}" AutoGenerateColumns="False" IsReadOnly="True" AlternatingRowBackground="#FFF0F0F0">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Ext. ID" Binding="{Binding ExternalId}" Width="100"/>
+                <DataGridTextColumn Header="TC ID" Binding="{Binding ExternalId}" Width="100"/>
                 <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="200"/>
 
-                <DataGridCheckBoxColumn Header="Active" Binding="{Binding IsActive}" IsReadOnly="True" Width="60"/>
+                <DataGridTextColumn Header="Covered Requirements" Binding="{Binding CoveredRequirementsText}" Width="150"/>
+                <DataGridTextColumn Header="Priority" Binding="{Binding Priority}" Width="80"/>
 
                 <DataGridTemplateColumn Header="Actions" Width="100">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Content="Deactivate" 
-                        Command="{Binding DataContext.DeactivateCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                        CommandParameter="{Binding}"
-                        Background="#FFDC3545" Foreground="White" BorderThickness="0" Padding="5,2"/>
+                    Command="{Binding DataContext.DeactivateCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                    CommandParameter="{Binding}"
+                    IsEnabled="{Binding DataContext.CanEdit, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                    Background="#FFDC3545" Foreground="White" BorderThickness="0" Padding="5,2"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Header="Covered Requirements" Binding="{Binding CoveredRequirementsText}" Width="150"/>
-                <DataGridTextColumn Header="Priority" Binding="{Binding Priority}" Width="80"/>
+
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Security.Claims;
 using TCM.Api.Data;
 using TCM.Shared.Models;
 
@@ -48,6 +49,13 @@ namespace TCM.Api.Controllers
         {
             if (file == null || file.Length == 0)
                 return BadRequest("No file uploaded.");
+
+            var callerIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(callerIdStr, out int callerId)) return Unauthorized();
+
+            var member = await _context.ProjectMembers.FirstOrDefaultAsync(pm => pm.ProjectId == projectId && pm.UserId == callerId);
+            if (member == null || member.Role != ProjectRole.Administrator)
+                return StatusCode(403, "Only Administrators can import requirements.");
 
             var requirementsToUpdate = new List<Requirement>();
             var requirementsToAdd = new List<Requirement>();

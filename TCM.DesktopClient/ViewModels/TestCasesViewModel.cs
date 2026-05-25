@@ -22,6 +22,13 @@ namespace TCM.DesktopClient.ViewModels
             set { _testCases = value; OnPropertyChanged(nameof(TestCases)); }
         }
 
+        private bool _canEdit;
+        public bool CanEdit
+        {
+            get => _canEdit;
+            set { _canEdit = value; OnPropertyChanged(nameof(CanEdit)); }
+        }
+
         public ICommand ImportSourceCommand { get; }
 
         public ICommand DeactivateCommand { get; }
@@ -40,6 +47,7 @@ namespace TCM.DesktopClient.ViewModels
             DeactivateCommand = new RelayCommand<TestCase>(async (tc) => await DeactivateTestCaseAsync(tc));
 
             _ = LoadTestCasesAsync();
+            _ = LoadMyRoleAsync();
         }
 
         private async Task LoadTestCasesAsync()
@@ -129,6 +137,26 @@ namespace TCM.DesktopClient.ViewModels
                 {
                     System.Windows.MessageBox.Show($"Error: {ex.Message}", "Critical Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
                 }
+            }
+        }
+
+        private async Task LoadMyRoleAsync()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/ProjectMembers/Project/{CurrentProject.Id}/MyRole");
+                if (response.IsSuccessStatusCode)
+                {
+                    var rawContent = await response.Content.ReadAsStringAsync();
+                    if (int.TryParse(rawContent, out int roleValue))
+                    {
+                        CanEdit = (roleValue == (int)ProjectRole.Administrator || roleValue == (int)ProjectRole.Tester);
+                    }
+                }
+            }
+            catch
+            {
+                CanEdit = false; // Bezpieczny fallback
             }
         }
 

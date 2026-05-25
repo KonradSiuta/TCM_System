@@ -22,6 +22,13 @@ namespace TCM.DesktopClient.ViewModels
             set { _requirements = value; OnPropertyChanged(nameof(Requirements)); }
         }
 
+        private bool _isAdmin;
+        public bool IsAdmin
+        {
+            get => _isAdmin;
+            set { _isAdmin = value; OnPropertyChanged(nameof(IsAdmin)); }
+        }
+
         public ICommand ImportCsvCommand { get; }
 
         public RequirementsViewModel(Project project)
@@ -36,6 +43,7 @@ namespace TCM.DesktopClient.ViewModels
             ImportCsvCommand = new RelayCommand(async () => await ImportCsvAsync());
 
             _ = LoadRequirementsAsync();
+            _ = LoadMyRoleAsync();
         }
 
         private async Task LoadRequirementsAsync()
@@ -93,6 +101,26 @@ namespace TCM.DesktopClient.ViewModels
                 {
                     System.Windows.MessageBox.Show($"An error occurred:\n{ex.Message}", "Critical Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
                 }
+            }
+        }
+
+        private async Task LoadMyRoleAsync()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/ProjectMembers/Project/{CurrentProject.Id}/MyRole");
+                if (response.IsSuccessStatusCode)
+                {
+                    var rawContent = await response.Content.ReadAsStringAsync();
+                    if (int.TryParse(rawContent, out int roleValue))
+                    { 
+                        IsAdmin = (roleValue == (int)ProjectRole.Administrator);
+                    }
+                }
+            }
+            catch
+            {
+                IsAdmin = false;
             }
         }
 

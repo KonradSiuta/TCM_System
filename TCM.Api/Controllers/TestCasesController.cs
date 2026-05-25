@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Security.Claims;
 using TCM.Api.Data;
 using TCM.Api.Services.Parsers;
 using TCM.Shared.Models;
@@ -44,6 +45,13 @@ namespace TCM.Api.Controllers
             var testCase = await _context.TestCases.FindAsync(id);
             if (testCase == null) return NotFound();
 
+            var callerIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(callerIdStr, out int callerId)) return Unauthorized();
+
+            var member = await _context.ProjectMembers.FirstOrDefaultAsync(pm => pm.ProjectId == testCase.ProjectId && pm.UserId == callerId);
+            if (member == null || member.Role == ProjectRole.Viewer)
+                return StatusCode(403, "Viewers cannot deactivate test cases.");
+
             testCase.IsActive = false;
             await _context.SaveChangesAsync();
 
@@ -55,6 +63,13 @@ namespace TCM.Api.Controllers
         {
             var project = await _context.Projects.FindAsync(projectId);
             if (project == null) return NotFound("Project not found.");
+
+            var callerIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(callerIdStr, out int callerId)) return Unauthorized();
+
+            var member = await _context.ProjectMembers.FirstOrDefaultAsync(pm => pm.ProjectId == projectId && pm.UserId == callerId);
+            if (member == null || member.Role == ProjectRole.Viewer)
+                return StatusCode(403, "Viewers cannot import test cases.");
 
             string parserName = project.ParserName;
 
