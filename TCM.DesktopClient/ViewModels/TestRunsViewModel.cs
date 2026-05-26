@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Media;
 using TCM.Shared.Models;
 
 namespace TCM.DesktopClient.ViewModels
@@ -19,6 +20,24 @@ namespace TCM.DesktopClient.ViewModels
 
         public ObservableCollection<TestRun> TestRuns { get; set; } = new();
         public ObservableCollection<TestCase> AvailableTestCases { get; set; } = new();
+
+        private bool _showStatistics = false;
+        public bool ShowStatistics
+        {
+            get => _showStatistics;
+            set
+            {
+                _showStatistics = value;
+                OnPropertyChanged(nameof(ShowStatistics));
+                OnPropertyChanged(nameof(ViewToggleText));
+            }
+        }
+        public string ViewToggleText => ShowStatistics ? "View execution table" : "View run rtatistics";
+
+        public DoubleCollection ExecutionDashArray { get; set; }
+        public DoubleCollection ResultDashArray { get; set; }
+        public string ExecutionText { get; set; }
+        public string ResultText { get; set; }
 
         private TestRun _selectedRun;
         public TestRun SelectedRun
@@ -34,6 +53,7 @@ namespace TCM.DesktopClient.ViewModels
                 if (_selectedRun != null && !_isFetchingDetails)
                 {
                     IsCreatingNew = false;
+                    ShowStatistics = false;
                     _ = LoadRunDetailsAsync();
                 }
             }
@@ -90,19 +110,24 @@ namespace TCM.DesktopClient.ViewModels
         public TestPriority SelectedPriorityFilter { get; set; } = TestPriority.Smoke;
         public Array Priorities => Enum.GetValues(typeof(TestPriority));
 
+        // --- KOMENDY ---
         public ICommand OpenCreatorCommand { get; }
         public ICommand CancelCreatorCommand { get; }
         public ICommand SelectByPriorityCommand { get; }
         public ICommand CreateRunCommand { get; }
+
         public ICommand SetPassedCommand { get; }
         public ICommand SetFailedCommand { get; }
+        public ICommand SaveExecutionDetailsCommand { get; }
+
         public ICommand ImportResultsCommand { get; }
         public ICommand ExportPdfCommand { get; }
         public ICommand StartEditCommand { get; }
         public ICommand CancelEditCommand { get; }
         public ICommand SaveEditCommand { get; }
         public ICommand DeleteRunCommand { get; }
-        public ICommand SaveExecutionDetailsCommand { get; }
+
+        public ICommand ToggleViewCommand { get; }
 
         public TestRunsViewModel(Project project)
         {
@@ -127,25 +152,26 @@ namespace TCM.DesktopClient.ViewModels
             SaveExecutionDetailsCommand = new RelayCommand<TestExecution>(async (ex) => await SaveExecutionAsync(ex, null));
 
             ImportResultsCommand = new RelayCommand(async () => await ImportResultsAsync());
-
             ExportPdfCommand = new RelayCommand(async () => await ExportPdfReportAsync());
 
-            StartEditCommand = new RelayCommand(() => 
-            { 
-                EditRunName = SelectedRun.Name; 
+            StartEditCommand = new RelayCommand(() =>
+            {
+                EditRunName = SelectedRun.Name;
                 EditRunEnvironment = SelectedRun.Environment;
                 EditRunPlannedEndDate = SelectedRun.PlannedEndDate;
                 OnPropertyChanged(nameof(EditRunName));
                 OnPropertyChanged(nameof(EditRunEnvironment));
                 OnPropertyChanged(nameof(EditRunPlannedEndDate));
-                IsEditingRun = true; 
+                IsEditingRun = true;
             });
+
             CancelEditCommand = new RelayCommand(() => IsEditingRun = false);
             SaveEditCommand = new RelayCommand(async () => await SaveEditAsync());
             DeleteRunCommand = new RelayCommand(async () => await DeleteRunAsync());
 
-            _ = LoadMyRoleAsync();
+            ToggleViewCommand = new RelayCommand(() => ShowStatistics = !ShowStatistics);
 
+            _ = LoadMyRoleAsync();
             _ = LoadRunsAsync();
             _ = LoadAvailableTestCasesAsync();
         }
@@ -184,6 +210,7 @@ namespace TCM.DesktopClient.ViewModels
                 if (details != null && SelectedRun != null && SelectedRun.Id == targetId)
                 {
                     SelectedRun = details;
+                    GenerateCharts();
                 }
             }
             finally
@@ -192,10 +219,41 @@ namespace TCM.DesktopClient.ViewModels
             }
         }
 
+        private void GenerateCharts()
+        {
+            if (SelectedRun == null) return;
+
+            double total = SelectedRun.Executions.Count;
+            if (total == 0) return;
+
+            int executed = SelectedRun.Executions.Count(e => e.Status != ExecutionStatus.Unexecuted);
+            double execPct = (executed / total) * 100;
+            ExecutionText = $"{execPct:F0}%";
+            ExecutionDashArray = CalculateDashArray(execPct);
+
+            int finished = SelectedRun.Executions.Count(e => e.Status == ExecutionStatus.Passed || e.Status == ExecutionStatus.Failed);
+            int passed = SelectedRun.Executions.Count(e => e.Status == ExecutionStatus.Passed);
+            double passPct = finished == 0 ? 0 : ((double)passed / finished) * 100;
+            ResultText = $"{passPct:F0}%";
+            ResultDashArray = CalculateDashArray(passPct);
+
+            OnPropertyChanged(nameof(ExecutionDashArray));
+            OnPropertyChanged(nameof(ResultDashArray));
+            OnPropertyChanged(nameof(ExecutionText));
+            OnPropertyChanged(nameof(ResultText));
+        }
+
+        private DoubleCollection CalculateDashArray(double percentage)
+        {
+            double totalDashLength = (2 * Math.PI * 65) / 20.0;
+            double coveredDashLength = (percentage / 100.0) * totalDashLength;
+
+            return new DoubleCollection { coveredDashLength, totalDashLength };
+        }
+
         private void SelectTestCasesByPriority()
         {
             var temp = AvailableTestCases.ToList();
-
             foreach (var tc in temp) tc.IsSelected = false;
 
             foreach (var tc in temp.Where(t => t.Priority == SelectedPriorityFilter))
@@ -204,10 +262,7 @@ namespace TCM.DesktopClient.ViewModels
             }
 
             AvailableTestCases.Clear();
-            foreach (var tc in temp)
-            {
-                AvailableTestCases.Add(tc);
-            }
+            foreach (var tc in temp) AvailableTestCases.Add(tc);
         }
 
         private async Task CreateRunAsync()
@@ -234,7 +289,6 @@ namespace TCM.DesktopClient.ViewModels
             {
                 await LoadRunsAsync();
                 IsCreatingNew = false;
-
                 foreach (var tc in AvailableTestCases) tc.IsSelected = false;
             }
         }
@@ -292,7 +346,6 @@ namespace TCM.DesktopClient.ViewModels
                     {
                         var summaryMessage = await response.Content.ReadAsStringAsync();
                         System.Windows.MessageBox.Show(summaryMessage, "Import Summary", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
-
                         await LoadRunDetailsAsync();
                     }
                     else
@@ -359,19 +412,12 @@ namespace TCM.DesktopClient.ViewModels
                     if (int.TryParse(rawContent, out int roleValue))
                     {
                         IsAdmin = (roleValue == (int)ProjectRole.Administrator);
-
                         CanExecute = (roleValue == (int)ProjectRole.Administrator || roleValue == (int)ProjectRole.Tester);
                     }
                 }
-                else
-                {
-                    var error = await response.Content.ReadAsStringAsync();
-                    System.Windows.MessageBox.Show($"Serwer odrzucił żądanie pobrania roli.\nStatus: {response.StatusCode}\nTreść: {error}", "Debug Info", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
-                }
             }
-            catch (Exception ex)
+            catch
             {
-                System.Windows.MessageBox.Show($"Wyjątek podczas łączenia z API w LoadMyRoleAsync:\n{ex.Message}", "Debug Info", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
                 IsAdmin = false;
                 CanExecute = false;
             }
@@ -381,10 +427,11 @@ namespace TCM.DesktopClient.ViewModels
         {
             if (SelectedRun == null) return;
 
-            var dto = new UpdateTestRunDto {
+            var dto = new UpdateTestRunDto
+            {
                 Name = EditRunName,
                 Environment = EditRunEnvironment,
-                PlannedEndDate = EditRunPlannedEndDate 
+                PlannedEndDate = EditRunPlannedEndDate
             };
             var response = await _httpClient.PutAsJsonAsync($"api/TestRuns/{SelectedRun.Id}", dto);
 
@@ -393,10 +440,6 @@ namespace TCM.DesktopClient.ViewModels
                 IsEditingRun = false;
                 await LoadRunsAsync();
                 await LoadRunDetailsAsync();
-            }
-            else
-            {
-                System.Windows.MessageBox.Show("Failed to update test run. Access Denied?", "Error");
             }
         }
 
@@ -413,10 +456,6 @@ namespace TCM.DesktopClient.ViewModels
                 {
                     SelectedRun = null;
                     await LoadRunsAsync();
-                }
-                else
-                {
-                    System.Windows.MessageBox.Show("Failed to delete test run. Access Denied?", "Error");
                 }
             }
         }

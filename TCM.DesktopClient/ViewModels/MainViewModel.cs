@@ -7,7 +7,6 @@ namespace TCM.DesktopClient.ViewModels
     {
         private object _currentView;
 
-        // Ta właściwość trzyma aktywny ekran. Zmiana jej wartości od razu podmieni widok!
         public object CurrentView
         {
             get => _currentView;
@@ -16,13 +15,12 @@ namespace TCM.DesktopClient.ViewModels
 
         public MainViewModel()
         {
-            ShowProjectList(); // Aplikacja zawsze startuje od listy projektów
+            ShowProjectList();
         }
 
         private void ShowProjectList()
         {
             var listVm = new ProjectListViewModel();
-            // Subskrybujemy zdarzenie: jeśli klikną projekt, odpal szczegóły
             listVm.OnProjectSelected = ShowProjectDetails;
             CurrentView = listVm;
         }
@@ -30,7 +28,6 @@ namespace TCM.DesktopClient.ViewModels
         private void ShowProjectDetails(Project project)
         {
             var detailsVm = new ProjectDetailsViewModel(project);
-            // Subskrybujemy zdarzenie: jeśli klikną 'Back', wróć do listy
             detailsVm.OnBackRequested = ShowProjectList;
             CurrentView = detailsVm;
         }

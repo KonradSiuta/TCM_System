@@ -46,7 +46,7 @@ namespace TCM.DesktopClient.ViewModels
             }
         }
 
-        public string ToggleViewButtonText => ShowAllTestCases ? "View Active Tests Only" : "View All Tests";
+        public string ToggleViewButtonText => ShowAllTestCases ? "View active tests only" : "View all tests";
 
         public ICommand ToggleViewCommand { get; }
         public ICommand ImportSourceCommand { get; }

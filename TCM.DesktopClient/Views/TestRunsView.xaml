@@ -13,7 +13,7 @@
 
         <Border Grid.Column="0" BorderBrush="#DDDDDD" BorderThickness="0,0,1,0" Margin="0,0,15,0" Padding="0,0,15,0">
             <StackPanel>
-                <Button Content="+ Create New Run" Command="{Binding OpenCreatorCommand}" IsEnabled="{Binding IsAdmin}" Background="#FF007ACC" Foreground="White" BorderThickness="0" Padding="10" Margin="0,0,0,15" FontWeight="Bold"/>
+                <Button Content="+ Create new run" Command="{Binding OpenCreatorCommand}" IsEnabled="{Binding IsAdmin}" Background="#FF007ACC" Foreground="White" BorderThickness="0" Padding="10" Margin="0,0,0,15" FontWeight="Bold"/>
 
                 <TextBlock Text="History" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
                 <ListBox ItemsSource="{Binding TestRuns}" SelectedItem="{Binding SelectedRun}" DisplayMemberPath="Name" BorderThickness="0" MinHeight="300" Background="Transparent"/>
@@ -23,7 +23,7 @@
         <Grid Grid.Column="1">
 
             <StackPanel Visibility="{Binding IsCreatingNew, Converter={StaticResource BoolToVis}}">
-                <TextBlock Text="Create New Test Run" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
+                <TextBlock Text="Create new test run" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
 
                 <WrapPanel Orientation="Horizontal" Margin="0,0,0,15">
                     <TextBlock Text="Name:" Width="50" VerticalAlignment="Center" Margin="0,0,0,5"/>
@@ -32,15 +32,15 @@
                     <TextBlock Text="Environment:" Width="80" VerticalAlignment="Center" Margin="0,0,0,5"/>
                     <TextBox Text="{Binding NewRunEnvironment}" Width="150" Margin="0,0,15,5" Padding="5"/>
 
-                    <TextBlock Text="Planned End Date:" Width="100" VerticalAlignment="Center" Margin="0,0,0,5"/>
+                    <TextBlock Text="Planned end date:" Width="100" VerticalAlignment="Center" Margin="0,0,0,5"/>
                     <DatePicker SelectedDate="{Binding NewRunPlannedEndDate}" Width="120" Margin="0,0,0,5"/>
                 </WrapPanel>
 
                 <Border Background="#FFEAEAEA" Padding="10" Margin="0,0,0,10" CornerRadius="5">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Quick Select by Priority:" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="SemiBold"/>
+                        <TextBlock Text="Quick select by priority:" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="SemiBold"/>
                         <ComboBox ItemsSource="{Binding Priorities}" SelectedItem="{Binding SelectedPriorityFilter}" Width="120" Margin="0,0,10,0"/>
-                        <Button Content="Select Matching" Command="{Binding SelectByPriorityCommand}" Background="#FF17A2B8" Foreground="White" BorderThickness="0" Padding="5,2"/>
+                        <Button Content="Select matching" Command="{Binding SelectByPriorityCommand}" Background="#FF17A2B8" Foreground="White" BorderThickness="0" Padding="5,2"/>
                     </StackPanel>
                 </Border>
 
@@ -48,13 +48,13 @@
                     <DataGrid.Columns>
                         <DataGridCheckBoxColumn Header="Select" Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" Width="50"/>
                         <DataGridTextColumn Header="Priority" Binding="{Binding Priority}" Width="100" IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Ext. ID" Binding="{Binding ExternalId}" Width="100" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Testcase ID" Binding="{Binding ExternalId}" Width="100" IsReadOnly="True"/>
                         <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="*" IsReadOnly="True"/>
                     </DataGrid.Columns>
                 </DataGrid>
 
                 <StackPanel Orientation="Horizontal">
-                    <Button Content="Save &amp; Create Run" Command="{Binding CreateRunCommand}" Background="#FF28A745" Foreground="White" BorderThickness="0" Padding="10" Width="150" Margin="0,0,10,0"/>
+                    <Button Content="Save &amp; create run" Command="{Binding CreateRunCommand}" Background="#FF28A745" Foreground="White" BorderThickness="0" Padding="10" Width="150" Margin="0,0,10,0"/>
                     <Button Content="Cancel" Command="{Binding CancelCreatorCommand}" Background="#FF6C757D" Foreground="White" BorderThickness="0" Padding="10" Width="100"/>
                 </StackPanel>
             </StackPanel>
@@ -102,8 +102,8 @@
                         </StackPanel>
 
                         <WrapPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
-                            <Button Content="Import Automated Results (XML)" Command="{Binding ImportResultsCommand}" IsEnabled="{Binding CanExecute}" Background="#FF6F42C1" Foreground="White" BorderThickness="0" Padding="10,5" Margin="0,0,5,5"/>
-                            <Button Content="Export PDF Report" Command="{Binding ExportPdfCommand}" Background="#FFDC3545" Foreground="White" BorderThickness="0" Padding="10,5" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                            <Button Content="Import automated results (XML)" Command="{Binding ImportResultsCommand}" IsEnabled="{Binding CanExecute}" Background="#FF6F42C1" Foreground="White" BorderThickness="0" Padding="10,5" Margin="0,0,5,5"/>
+                            <Button Content="Export PDF report" Command="{Binding ExportPdfCommand}" Background="#FFDC3545" Foreground="White" BorderThickness="0" Padding="10,5" Margin="0,0,0,5" FontWeight="SemiBold"/>
                         </WrapPanel>
                     </Grid>
 
@@ -123,11 +123,11 @@
                                     </Style.Triggers>
                                 </Style>
                             </StackPanel.Style>
-                            <Button Content="Edit Details" Command="{Binding StartEditCommand}" IsEnabled="{Binding IsAdmin}" Background="#FF17A2B8" Foreground="White" BorderThickness="0" Padding="10,4" Margin="0,0,10,0"/>
-                            <Button Content="Delete Run" Command="{Binding DeleteRunCommand}" IsEnabled="{Binding IsAdmin}" Background="#FFDC3545" Foreground="White" BorderThickness="0" Padding="10,4"/>
+                            <Button Content="Edit details" Command="{Binding StartEditCommand}" IsEnabled="{Binding IsAdmin}" Background="#FF17A2B8" Foreground="White" BorderThickness="0" Padding="10,4" Margin="0,0,10,0"/>
+                            <Button Content="Delete run" Command="{Binding DeleteRunCommand}" IsEnabled="{Binding IsAdmin}" Background="#FFDC3545" Foreground="White" BorderThickness="0" Padding="10,4"/>
                         </StackPanel>
 
-                        <Border Background="#FFFFE8A1" Padding="10" CornerRadius="5">
+                        <Border Background="#FFFFE8A1" Padding="10" CornerRadius="5" Margin="0,5,0,0">
                             <Border.Style>
                                 <Style TargetType="Border">
                                     <Setter Property="Visibility" Value="Collapsed"/>
@@ -145,7 +145,7 @@
                                 <TextBlock Text="Environment:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,5,0"/>
                                 <TextBox Text="{Binding EditRunEnvironment}" Width="150" Padding="3" Margin="0,0,15,5"/>
 
-                                <TextBlock Text="New End Date:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,5,0"/>
+                                <TextBlock Text="New end date:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,5,0"/>
                                 <DatePicker SelectedDate="{Binding EditRunPlannedEndDate}" Width="120" Padding="3" Margin="0,0,15,5"/>
 
                                 <Button Content="Save" Command="{Binding SaveEditCommand}" Background="#FF28A745" Foreground="White" BorderThickness="0" Padding="10,2" Margin="0,0,5,5"/>
@@ -155,47 +155,116 @@
                     </StackPanel>
                 </StackPanel>
 
-                <DataGrid ItemsSource="{Binding SelectedRun.Executions}" AutoGenerateColumns="False" IsReadOnly="True" AlternatingRowBackground="#FFF0F0F0" Height="400">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Test ID" Binding="{Binding TestCase.ExternalId}" Width="90"/>
-                        <DataGridTextColumn Header="Title" Binding="{Binding TestCase.Title}" Width="150"/>
-                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="80"/>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <Button Content="{Binding ViewToggleText}" Command="{Binding ToggleViewCommand}" Background="#FF007ACC" Foreground="White" BorderThickness="0" Padding="15,6" FontWeight="SemiBold"/>
+                </StackPanel>
 
-                        <DataGridTemplateColumn Header="Logs / Notes" Width="200">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBox Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}" 
-                                             IsEnabled="{Binding DataContext.CanExecute, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
-                                             TextWrapping="Wrap" AcceptsReturn="True" Padding="2" Margin="2"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
+                <Grid>
 
-                        <DataGridTemplateColumn Header="Defect URL" Width="150">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBox Text="{Binding DefectUrl, UpdateSourceTrigger=PropertyChanged}" 
-                                             IsEnabled="{Binding DataContext.CanExecute, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
-                                             Padding="2" Margin="2" ToolTip="e.g. https://jira.com/browse/BUG-123"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
+                    <UniformGrid Columns="2" Height="400">
+                        <UniformGrid.Style>
+                            <Style TargetType="UniformGrid">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ShowStatistics}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </UniformGrid.Style>
 
-                        <DataGridTemplateColumn Header="Actions" Width="170">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                        <Button Content="Pass" Command="{Binding DataContext.SetPassedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" IsEnabled="{Binding DataContext.CanExecute, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Background="#FF28A745" Foreground="White" BorderThickness="0" Padding="5,2" Margin="0,0,5,5" Width="45"/>
-                                        <Button Content="Fail" Command="{Binding DataContext.SetFailedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" IsEnabled="{Binding DataContext.CanExecute, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Background="#FFDC3545" Foreground="White" BorderThickness="0" Padding="5,2" Margin="0,0,5,5" Width="45"/>
-                                        <Button Content="Save" Command="{Binding DataContext.SaveExecutionDetailsCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" IsEnabled="{Binding DataContext.CanExecute, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Background="#FF007ACC" Foreground="White" BorderThickness="0" Padding="5,2" Margin="0,0,0,5" Width="45" ToolTip="Save Notes and URL manually"/>
-                                    </WrapPanel>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                    </DataGrid.Columns>
-                </DataGrid>
+                        <Border Background="White" CornerRadius="8" Margin="10" Padding="15" BorderBrush="#E0E0E0" BorderThickness="1">
+                            <Border.Effect>
+                                <DropShadowEffect Color="#DDDDDD" BlurRadius="8" ShadowDepth="2" Opacity="0.5"/>
+                            </Border.Effect>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="Execution progress" FontSize="16" Foreground="#555" HorizontalAlignment="Center" FontWeight="Bold" Margin="0,0,0,20"/>
+                                <Grid Width="150" Height="150" HorizontalAlignment="Center">
+                                    <Ellipse Stroke="#E0E0E0" StrokeThickness="20"/>
+                                    <Ellipse Stroke="#007ACC" StrokeThickness="20" StrokeDashArray="{Binding ExecutionDashArray}" RenderTransformOrigin="0.5,0.5">
+                                        <Ellipse.RenderTransform>
+                                            <RotateTransform Angle="-90"/>
+                                        </Ellipse.RenderTransform>
+                                    </Ellipse>
+                                    <TextBlock Text="{Binding ExecutionText}" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
+                                </Grid>
+                                <TextBlock Text="Shows how many tests have been executed" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" Margin="0,20,0,0" TextWrapping="Wrap" TextAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="White" CornerRadius="8" Margin="10" Padding="15" BorderBrush="#E0E0E0" BorderThickness="1">
+                            <Border.Effect>
+                                <DropShadowEffect Color="#DDDDDD" BlurRadius="8" ShadowDepth="2" Opacity="0.5"/>
+                            </Border.Effect>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="Pass rate" FontSize="16" Foreground="#555" HorizontalAlignment="Center" FontWeight="Bold" Margin="0,0,0,20"/>
+                                <Grid Width="150" Height="150" HorizontalAlignment="Center">
+                                    <Ellipse Stroke="#DC3545" StrokeThickness="20"/>
+                                    <Ellipse Stroke="#28A745" StrokeThickness="20" StrokeDashArray="{Binding ResultDashArray}" RenderTransformOrigin="0.5,0.5">
+                                        <Ellipse.RenderTransform>
+                                            <RotateTransform Angle="-90"/>
+                                        </Ellipse.RenderTransform>
+                                    </Ellipse>
+                                    <TextBlock Text="{Binding ResultText}" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
+                                </Grid>
+                                <TextBlock Text="Calculated only for executed tests" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" Margin="0,20,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </UniformGrid>
+
+
+                    <DataGrid ItemsSource="{Binding SelectedRun.Executions}" AutoGenerateColumns="False" IsReadOnly="True" AlternatingRowBackground="#FFF0F0F0" Height="400">
+                        <DataGrid.Style>
+                            <Style TargetType="DataGrid">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ShowStatistics}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.Style>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Testcase ID" Binding="{Binding TestCase.ExternalId}" Width="90"/>
+                            <DataGridTextColumn Header="Title" Binding="{Binding TestCase.Title}" Width="150"/>
+                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="80"/>
+
+                            <DataGridTemplateColumn Header="Logs / Notes" Width="200">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBox Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}" 
+                                                 IsEnabled="{Binding DataContext.CanExecute, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
+                                                 TextWrapping="Wrap" AcceptsReturn="True" Padding="2" Margin="2"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn Header="Defect URL" Width="150">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBox Text="{Binding DefectUrl, UpdateSourceTrigger=PropertyChanged}" 
+                                                 IsEnabled="{Binding DataContext.CanExecute, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
+                                                 Padding="2" Margin="2" ToolTip="e.g. https://jira.com/browse/BUG-123"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn Header="Actions" Width="170">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Button Content="Pass" Command="{Binding DataContext.SetPassedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" IsEnabled="{Binding DataContext.CanExecute, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Background="#FF28A745" Foreground="White" BorderThickness="0" Padding="5,2" Margin="0,0,5,5" Width="45"/>
+                                            <Button Content="Fail" Command="{Binding DataContext.SetFailedCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" IsEnabled="{Binding DataContext.CanExecute, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Background="#FFDC3545" Foreground="White" BorderThickness="0" Padding="5,2" Margin="0,0,5,5" Width="45"/>
+                                            <Button Content="Save" Command="{Binding DataContext.SaveExecutionDetailsCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" IsEnabled="{Binding DataContext.CanExecute, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Background="#FF007ACC" Foreground="White" BorderThickness="0" Padding="5,2" Margin="0,0,0,5" Width="45" ToolTip="Save Notes and URL manually"/>
+                                        </WrapPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+
             </StackPanel>
-
         </Grid>
     </Grid>
 </UserControl>
