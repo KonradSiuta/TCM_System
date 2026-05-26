@@ -91,13 +91,19 @@ namespace TCM.Api.Controllers
 
             var summary = new ProjectSummaryDto();
 
-            var requirements = await _context.Requirements
+            var allRequirements = await _context.Requirements
                 .Include(r => r.TestCaseCoverages)
                 .Where(r => r.ProjectId == id)
                 .ToListAsync();
 
-            summary.TotalRequirements = requirements.Count;
-            summary.CoveredRequirements = requirements.Count(r => r.TestCaseCoverages.Any());
+            var activeRequirements = allRequirements.Where(r => r.Status != RequirementStatus.Canceled).ToList();
+
+            summary.TotalRequirements = activeRequirements.Count;
+            summary.CoveredRequirements = activeRequirements.Count(r => r.TestCaseCoverages.Any());
+
+            summary.RequirementsByStatus = allRequirements
+                .GroupBy(r => r.Status.ToString())
+                .ToDictionary(g => g.Key, g => g.Count());
 
             var testCases = await _context.TestCases
                 .Include(tc => tc.RequirementCoverages)
@@ -108,13 +114,21 @@ namespace TCM.Api.Controllers
             summary.TotalTestCases = testCases.Count;
             summary.ActiveTestCases = testCases.Count(tc => tc.IsActive);
 
+            summary.TestCasesByPriority = testCases
+                .Where(tc => tc.IsActive)
+                .GroupBy(tc => tc.Priority.ToString())
+                .ToDictionary(g => g.Key, g => g.Count());
+
             summary.TotalTestRuns = await _context.TestRuns.CountAsync(tr => tr.ProjectId == id);
 
             foreach (var tc in testCases.Where(t => t.IsActive))
             {
                 foreach (var cov in tc.RequirementCoverages)
                 {
-                    if (cov.CoveredVersion < cov.Requirement.Version)
+                    bool isCanceled = cov.Requirement.Status == RequirementStatus.Canceled;
+                    bool isOutdated = cov.CoveredVersion < cov.Requirement.Version;
+
+                    if (isCanceled || isOutdated)
                     {
                         summary.OutdatedTestCases.Add(new OutdatedCoverageDto
                         {
@@ -122,7 +136,8 @@ namespace TCM.Api.Controllers
                             TestCaseTitle = tc.Title,
                             RequirementExternalId = cov.Requirement.ExternalRequirementId,
                             CoveredVersion = cov.CoveredVersion,
-                            CurrentRequirementVersion = cov.Requirement.Version
+                            CurrentRequirementVersion = cov.Requirement.Version,
+                            IsRequirementCanceled = isCanceled
                         });
                     }
                 }

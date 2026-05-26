@@ -14,6 +14,9 @@ namespace TCM.Shared.Models
         public int TotalTestRuns { get; set; }
 
         public List<OutdatedCoverageDto> OutdatedTestCases { get; set; } = new();
+
+        public Dictionary<string, int> RequirementsByStatus { get; set; } = new();
+        public Dictionary<string, int> TestCasesByPriority { get; set; } = new();
     }
 
     public class OutdatedCoverageDto
@@ -23,5 +26,6 @@ namespace TCM.Shared.Models
         public string RequirementExternalId { get; set; }
         public double CoveredVersion { get; set; }
         public double CurrentRequirementVersion { get; set; }
+        public bool IsRequirementCanceled { get; set; }
     }
 }
