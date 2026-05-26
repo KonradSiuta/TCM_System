@@ -11,7 +11,8 @@ namespace TCM.Shared.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public string ParserName { get; set; } = "DoxygenStyle";
-        public TestResultParserType TestResultParser { get; set; } = TestResultParserType.None;
+        public string TestResultParser { get; set; } = "JUnitXML";
+
         public ProjectStatus Status { get; set; } = ProjectStatus.Active;
 
         public List<Requirement> Requirements { get; set; } = new();

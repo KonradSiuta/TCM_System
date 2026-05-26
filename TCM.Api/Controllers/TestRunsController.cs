@@ -144,7 +144,7 @@ namespace TCM.Api.Controllers
 
             string parserName = project.TestResultParser.ToString();
 
-            if (project.TestResultParser == TestResultParserType.None)
+            if (project.TestResultParser == "JUnitXML")
                 return BadRequest("This project has no Test Result Parser configured. Please set it to JUnitXml or EcuSimulatorXml.");
 
             if (!System.IO.File.Exists("report_parsers.json"))

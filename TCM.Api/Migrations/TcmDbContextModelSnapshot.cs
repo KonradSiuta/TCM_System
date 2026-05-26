@@ -48,8 +48,9 @@ namespace TCM.Api.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<int>("TestResultParser")
-                        .HasColumnType("int");
+                    b.Property<string>("TestResultParser")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
