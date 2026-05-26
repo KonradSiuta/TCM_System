@@ -33,7 +33,7 @@ namespace TCM.Api.Controllers
             var testCases = await _context.TestCases
                 .Include(t => t.RequirementCoverages)
                     .ThenInclude(rc => rc.Requirement)
-                .Where(t => t.ProjectId == projectId && t.IsActive)
+                .Where(t => t.ProjectId == projectId)
                 .ToListAsync();
 
             return Ok(testCases);

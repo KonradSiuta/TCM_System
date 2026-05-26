@@ -12,13 +12,44 @@
         </StackPanel>
 
         <DataGrid Grid.Row="1" ItemsSource="{Binding Requirements}" AutoGenerateColumns="False" IsReadOnly="True" AlternatingRowBackground="#FFF0F0F0">
+
+            <DataGrid.Resources>
+                <Style x:Key="ExpandableText" TargetType="TextBlock">
+                    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                    <Setter Property="TextWrapping" Value="NoWrap"/>
+                    <Setter Property="Padding" Value="2"/>
+
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=DataGridRow}}" Value="True">
+                            <Setter Property="TextWrapping" Value="Wrap"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.Resources>
+
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Internal ID" Binding="{Binding Id}" Width="80"/>
-                <DataGridTextColumn Header="Ext. ID" Binding="{Binding ExternalRequirementId}" Width="100"/>
-                <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="200"/>
+                <DataGridTextColumn Header="Testcase ID" Binding="{Binding ExternalRequirementId}" Width="100"/>
+
+                <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="200">
+                    <DataGridTextColumn.ElementStyle>
+                        <StaticResource ResourceKey="ExpandableText"/>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
                 <DataGridTextColumn Header="Version" Binding="{Binding Version}" Width="60"/>
                 <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100"/>
-                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
+
+                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*">
+                    <DataGridTextColumn.ElementStyle>
+                        <StaticResource ResourceKey="ExpandableText"/>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridTextColumn Header="Covered by testcases" Binding="{Binding CoveredByTests}" Width="150">
+                    <DataGridTextColumn.ElementStyle>
+                        <StaticResource ResourceKey="ExpandableText"/>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

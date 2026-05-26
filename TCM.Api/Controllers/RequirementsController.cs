@@ -29,6 +29,8 @@ namespace TCM.Api.Controllers
         public async Task<ActionResult<IEnumerable<Requirement>>> GetProjectRequirements(int projectId)
         {
             var requirements = await _context.Requirements
+                .Include(r => r.TestCaseCoverages)
+                    .ThenInclude(cov => cov.TestCase)
                 .Where(r => r.ProjectId == projectId)
                 .ToListAsync();
 

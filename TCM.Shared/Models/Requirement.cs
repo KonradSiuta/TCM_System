@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace TCM.Shared.Models
 {
@@ -15,5 +17,10 @@ namespace TCM.Shared.Models
 
         public Project Project { get; set; }
         public List<RequirementCoverage> TestCaseCoverages { get; set; } = new();
+
+        [NotMapped]
+        public string CoveredByTests => TestCaseCoverages != null && TestCaseCoverages.Any()
+            ? string.Join(", ", TestCaseCoverages.Where(c => c.TestCase != null).Select(c => c.TestCase.ExternalId))
+            : "None";
     }
 }

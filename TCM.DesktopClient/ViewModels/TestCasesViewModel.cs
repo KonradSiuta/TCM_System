@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
@@ -14,6 +16,8 @@ namespace TCM.DesktopClient.ViewModels
     {
         private readonly HttpClient _httpClient;
         public Project CurrentProject { get; }
+
+        private List<TestCase> _allTestCasesDb = new();
 
         private ObservableCollection<TestCase> _testCases;
         public ObservableCollection<TestCase> TestCases
@@ -29,8 +33,23 @@ namespace TCM.DesktopClient.ViewModels
             set { _canEdit = value; OnPropertyChanged(nameof(CanEdit)); }
         }
 
-        public ICommand ImportSourceCommand { get; }
+        private bool _showAllTestCases = false;
+        public bool ShowAllTestCases
+        {
+            get => _showAllTestCases;
+            set
+            {
+                _showAllTestCases = value;
+                OnPropertyChanged(nameof(ShowAllTestCases));
+                OnPropertyChanged(nameof(ToggleViewButtonText));
+                ApplyFilter();
+            }
+        }
 
+        public string ToggleViewButtonText => ShowAllTestCases ? "View Active Tests Only" : "View All Tests";
+
+        public ICommand ToggleViewCommand { get; }
+        public ICommand ImportSourceCommand { get; }
         public ICommand DeactivateCommand { get; }
 
         public TestCasesViewModel(Project project)
@@ -42,8 +61,8 @@ namespace TCM.DesktopClient.ViewModels
             _httpClient.DefaultRequestHeaders.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", AppSession.JwtToken);
 
+            ToggleViewCommand = new RelayCommand(() => ShowAllTestCases = !ShowAllTestCases);
             ImportSourceCommand = new RelayCommand(async () => await ImportSourceAsync());
-
             DeactivateCommand = new RelayCommand<TestCase>(async (tc) => await DeactivateTestCaseAsync(tc));
 
             _ = LoadTestCasesAsync();
@@ -57,7 +76,8 @@ namespace TCM.DesktopClient.ViewModels
                 var tcs = await _httpClient.GetFromJsonAsync<TestCase[]>($"api/TestCases/Project/{CurrentProject.Id}");
                 if (tcs != null)
                 {
-                    TestCases = new ObservableCollection<TestCase>(tcs);
+                    _allTestCasesDb = tcs.ToList();
+                    ApplyFilter();
                 }
             }
             catch (Exception ex)
@@ -66,11 +86,22 @@ namespace TCM.DesktopClient.ViewModels
             }
         }
 
+        private void ApplyFilter()
+        {
+            if (_allTestCasesDb == null) return;
+
+            var filtered = ShowAllTestCases
+                ? _allTestCasesDb
+                : _allTestCasesDb.Where(tc => tc.IsActive).ToList();
+
+            TestCases = new ObservableCollection<TestCase>(filtered);
+        }
+
         private async Task ImportSourceAsync()
         {
             var openFileDialog = new Microsoft.Win32.OpenFileDialog
             {
-                Filter = "Source files (*.cpp;*.h;*.py)|*.cpp;*.h;*.py|All files (*.*)|*.*",
+                Filter = "Source files (*.cpp;*.h;*.py;*.cs)|*.cpp;*.h;*.py;*.cs|All files (*.*)|*.*",
                 Title = "Select Source Code File"
             };
 
@@ -156,7 +187,7 @@ namespace TCM.DesktopClient.ViewModels
             }
             catch
             {
-                CanEdit = false; // Bezpieczny fallback
+                CanEdit = false;
             }
         }
 
