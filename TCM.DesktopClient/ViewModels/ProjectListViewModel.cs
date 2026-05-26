@@ -70,17 +70,6 @@ namespace TCM.DesktopClient.ViewModels
             {
                 _selectedProject = value;
                 OnPropertyChanged(nameof(SelectedProject));
-
-                if (value != null)
-                {
-                    var projectToOpen = value;
-                    System.Windows.Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        _selectedProject = null;
-                        OnPropertyChanged(nameof(SelectedProject));
-                        OnProjectSelected?.Invoke(projectToOpen);
-                    }), System.Windows.Threading.DispatcherPriority.Background);
-                }
             }
         }
 
@@ -89,6 +78,7 @@ namespace TCM.DesktopClient.ViewModels
         public ICommand CancelCreateCommand { get; }
         public ICommand UploadTestCaseParserCommand { get; }
         public ICommand UploadTestResultParserCommand { get; }
+        public ICommand OpenProjectCommand { get; }
 
         public ProjectListViewModel()
         {
@@ -109,6 +99,13 @@ namespace TCM.DesktopClient.ViewModels
 
             UploadTestCaseParserCommand = new RelayCommand(async () => await UploadParserAsync("TestCases"));
             UploadTestResultParserCommand = new RelayCommand(async () => await UploadParserAsync("TestResults"));
+            OpenProjectCommand = new RelayCommand(() =>
+            {
+                if (SelectedProject != null)
+                {
+                    OnProjectSelected?.Invoke(SelectedProject);
+                }
+            });
 
             _ = LoadProjectsAsync();
             _ = LoadParsersAsync();
