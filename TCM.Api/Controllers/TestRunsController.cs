@@ -97,8 +97,8 @@ namespace TCM.Api.Controllers
             return CreatedAtAction(nameof(GetTestRun), new { id = testRun.Id }, testRun);
         }
 
-        [HttpPatch("Execution/{executionId}/status")]
-        public async Task<IActionResult> UpdateExecutionStatus(int executionId, [FromBody] ExecutionStatus status)
+        [HttpPut("Execution/{executionId}")]
+        public async Task<IActionResult> UpdateExecution(int executionId, [FromBody] UpdateExecutionDto dto)
         {
             var execution = await _context.TestExecutions
                 .Include(e => e.TestRun)
@@ -112,10 +112,12 @@ namespace TCM.Api.Controllers
             if (member == null || member.Role == ProjectRole.Viewer)
                 return StatusCode(403, "Viewers cannot modify execution status.");
 
-            execution.Status = status;
+            execution.Status = dto.Status;
+            execution.Notes = dto.Notes ?? "";
+            execution.DefectUrl = dto.DefectUrl ?? "";
             execution.ExecutedAt = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
 
+            await _context.SaveChangesAsync();
             return Ok();
         }
 
@@ -322,8 +324,9 @@ namespace TCM.Api.Controllers
                             {
                                 columns.ConstantColumn(60);
                                 columns.RelativeColumn(3);
-                                columns.ConstantColumn(80);
-                                columns.ConstantColumn(80);
+                                columns.ConstantColumn(50);
+                                columns.ConstantColumn(60);
+                                columns.RelativeColumn(2);
                                 columns.RelativeColumn(2);
                             });
 
@@ -334,6 +337,7 @@ namespace TCM.Api.Controllers
                                 header.Cell().Background("#007ACC").Padding(5).Text("Mode").Bold().FontColor(Colors.White);
                                 header.Cell().Background("#007ACC").Padding(5).Text("Status").Bold().FontColor(Colors.White);
                                 header.Cell().Background("#007ACC").Padding(5).Text("Notes").Bold().FontColor(Colors.White);
+                                header.Cell().Background("#007ACC").Padding(5).Text("Defect URL").Bold().FontColor(Colors.White);
                             });
 
                             foreach (var exec in testRun.Executions)
@@ -348,6 +352,8 @@ namespace TCM.Api.Controllers
                                 table.Cell().BorderBottom(0.5f).BorderColor(Colors.Grey.Lighten2).Padding(5).Text(exec.Mode.ToString());
                                 table.Cell().BorderBottom(0.5f).BorderColor(Colors.Grey.Lighten2).Padding(5).Text(statusText).Bold().FontColor(statusColor);
                                 table.Cell().BorderBottom(0.5f).BorderColor(Colors.Grey.Lighten2).Padding(5).Text(string.IsNullOrWhiteSpace(exec.Notes) ? "-" : exec.Notes).FontSize(9);
+
+                                table.Cell().BorderBottom(0.5f).BorderColor(Colors.Grey.Lighten2).Padding(5).Text(string.IsNullOrWhiteSpace(exec.DefectUrl) ? "-" : exec.DefectUrl).FontSize(9).FontColor(Colors.Blue.Medium);
                             }
                         });
                     });

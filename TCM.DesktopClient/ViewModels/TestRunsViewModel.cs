@@ -102,6 +102,7 @@ namespace TCM.DesktopClient.ViewModels
         public ICommand CancelEditCommand { get; }
         public ICommand SaveEditCommand { get; }
         public ICommand DeleteRunCommand { get; }
+        public ICommand SaveExecutionDetailsCommand { get; }
 
         public TestRunsViewModel(Project project)
         {
@@ -121,9 +122,10 @@ namespace TCM.DesktopClient.ViewModels
             SelectByPriorityCommand = new RelayCommand(SelectTestCasesByPriority);
             CreateRunCommand = new RelayCommand(async () => await CreateRunAsync());
 
-            SetPassedCommand = new RelayCommand<TestExecution>(async (ex) => await UpdateStatusAsync(ex, ExecutionStatus.Passed));
-            SetFailedCommand = new RelayCommand<TestExecution>(async (ex) => await UpdateStatusAsync(ex, ExecutionStatus.Failed));
-            
+            SetPassedCommand = new RelayCommand<TestExecution>(async (ex) => await SaveExecutionAsync(ex, ExecutionStatus.Passed));
+            SetFailedCommand = new RelayCommand<TestExecution>(async (ex) => await SaveExecutionAsync(ex, ExecutionStatus.Failed));
+            SaveExecutionDetailsCommand = new RelayCommand<TestExecution>(async (ex) => await SaveExecutionAsync(ex, null));
+
             ImportResultsCommand = new RelayCommand(async () => await ImportResultsAsync());
 
             ExportPdfCommand = new RelayCommand(async () => await ExportPdfReportAsync());
@@ -237,13 +239,29 @@ namespace TCM.DesktopClient.ViewModels
             }
         }
 
-        private async Task UpdateStatusAsync(TestExecution execution, ExecutionStatus status)
+        private async Task SaveExecutionAsync(TestExecution execution, ExecutionStatus? newStatus)
         {
             if (execution == null) return;
-            var response = await _httpClient.PatchAsJsonAsync($"api/TestRuns/Execution/{execution.Id}/status", status);
+
+            var dto = new UpdateExecutionDto
+            {
+                Status = newStatus ?? execution.Status,
+                Notes = execution.Notes,
+                DefectUrl = execution.DefectUrl
+            };
+
+            var response = await _httpClient.PutAsJsonAsync($"api/TestRuns/Execution/{execution.Id}", dto);
+
             if (response.IsSuccessStatusCode)
             {
+                if (newStatus == null)
+                    System.Windows.MessageBox.Show("Saved execution details!", "Success", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+
                 await LoadRunDetailsAsync();
+            }
+            else
+            {
+                System.Windows.MessageBox.Show("Failed to save execution details.", "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
             }
         }
 

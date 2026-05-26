@@ -17,4 +17,11 @@ namespace TCM.Shared.Models
         public string Environment { get; set; }
         public DateTime? PlannedEndDate { get; set; }
     }
+
+    public class UpdateExecutionDto
+    {
+        public ExecutionStatus Status { get; set; }
+        public string Notes { get; set; }
+        public string DefectUrl { get; set; }
+    }
 }
