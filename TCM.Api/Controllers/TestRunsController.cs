@@ -142,19 +142,17 @@ namespace TCM.Api.Controllers
             var project = await _context.Projects.FindAsync(testRun.ProjectId);
             if (project == null) return NotFound("Project not found.");
 
-            string parserName = project.TestResultParser.ToString();
+            string parserName = project.TestResultParser;
 
-            if (project.TestResultParser == "JUnitXML")
-                return BadRequest("This project has no Test Result Parser configured. Please set it to JUnitXml or EcuSimulatorXml.");
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Parsers", "TestResults", $"{parserName}.json");
 
-            if (!System.IO.File.Exists("report_parsers.json"))
-                return BadRequest("report_parsers.json configuration file is missing.");
+            if (!System.IO.File.Exists(filePath))
+                return BadRequest($"Report parser configuration file '{parserName}.json' not found on the server.");
 
-            var parsersJson = await System.IO.File.ReadAllTextAsync("report_parsers.json");
-            var templates = System.Text.Json.JsonSerializer.Deserialize<List<ReportParserTemplate>>(parsersJson);
-            var template = templates?.FirstOrDefault(t => t.Name == parserName);
+            var parsersJson = await System.IO.File.ReadAllTextAsync(filePath);
+            var template = System.Text.Json.JsonSerializer.Deserialize<ReportParserTemplate>(parsersJson);
 
-            if (template == null) return BadRequest($"Report parser template '{parserName}' not found.");
+            if (template == null) return BadRequest($"Failed to load report parser template '{parserName}'.");
 
             try
             {

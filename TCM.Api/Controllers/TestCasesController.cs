@@ -73,11 +73,15 @@ namespace TCM.Api.Controllers
 
             string parserName = project.ParserName;
 
-            var parsersJson = await System.IO.File.ReadAllTextAsync("parsers.json");
-            var templates = System.Text.Json.JsonSerializer.Deserialize<List<ParserTemplate>>(parsersJson);
-            var template = templates.FirstOrDefault(t => t.Name == parserName);
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Parsers", "TestCases", $"{parserName}.json");
 
-            if (template == null) return BadRequest($"Parser template '{parserName}' not found in parsers.json.");
+            if (!System.IO.File.Exists(filePath))
+                return BadRequest($"Parser configuration file '{parserName}.json' not found on the server.");
+
+            var parsersJson = await System.IO.File.ReadAllTextAsync(filePath);
+            var template = System.Text.Json.JsonSerializer.Deserialize<ParserTemplate>(parsersJson);
+
+            if (template == null) return BadRequest($"Failed to load parser template '{parserName}'.");
 
             string fileContent;
             using (var reader = new StreamReader(file.OpenReadStream())) { fileContent = await reader.ReadToEndAsync(); }

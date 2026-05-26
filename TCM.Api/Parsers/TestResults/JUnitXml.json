@@ -1,0 +1,9 @@
+{
+    "Name": "JUnitXml",
+    "TestCaseNode": "testcase",
+    "IdentityAttribute": "name",
+    "SecondaryIdentityAttribute": "classname",
+    "FailureNode": "failure",
+    "FailureMessageAttribute": "message",
+    "SkippedNode": "skipped"
+  }

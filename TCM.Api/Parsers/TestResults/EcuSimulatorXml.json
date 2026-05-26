@@ -1,0 +1,9 @@
+{
+  "Name": "EcuSimulatorXml",
+  "TestCaseNode": "test-case",
+  "IdentityAttribute": "name",
+  "SecondaryIdentityAttribute": "fullname",
+  "FailureNode": "failed",
+  "FailureMessageAttribute": "message",
+  "SkippedNode": "reason"
+}
