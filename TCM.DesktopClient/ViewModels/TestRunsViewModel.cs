@@ -32,7 +32,7 @@ namespace TCM.DesktopClient.ViewModels
                 OnPropertyChanged(nameof(ViewToggleText));
             }
         }
-        public string ViewToggleText => ShowStatistics ? "View execution table" : "View run rtatistics";
+        public string ViewToggleText => ShowStatistics ? "View execution table" : "View run statistics";
 
         public DoubleCollection ExecutionDashArray { get; set; }
         public DoubleCollection ResultDashArray { get; set; }
@@ -132,7 +132,7 @@ namespace TCM.DesktopClient.ViewModels
         public TestRunsViewModel(Project project)
         {
             CurrentProject = project;
-            _httpClient = new HttpClient { BaseAddress = new Uri("https://localhost:7243/") };
+            _httpClient = new HttpClient { BaseAddress = new Uri(AppSettings.ApiBaseUrl) };
             _httpClient.DefaultRequestHeaders.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", AppSession.JwtToken);
 

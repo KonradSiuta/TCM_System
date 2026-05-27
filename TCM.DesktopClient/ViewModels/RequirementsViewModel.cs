@@ -36,7 +36,7 @@ namespace TCM.DesktopClient.ViewModels
             CurrentProject = project;
             Requirements = new ObservableCollection<Requirement>();
 
-            _httpClient = new HttpClient { BaseAddress = new Uri("https://localhost:7243/") };
+            _httpClient = new HttpClient { BaseAddress = new Uri(AppSettings.ApiBaseUrl) };
             _httpClient.DefaultRequestHeaders.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", AppSession.JwtToken);
 
