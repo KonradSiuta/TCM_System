@@ -79,6 +79,7 @@ namespace TCM.DesktopClient.ViewModels
         public ICommand UploadTestCaseParserCommand { get; }
         public ICommand UploadTestResultParserCommand { get; }
         public ICommand OpenProjectCommand { get; }
+        public ICommand LogoutCommand { get; }
 
         public ProjectListViewModel()
         {
@@ -104,6 +105,23 @@ namespace TCM.DesktopClient.ViewModels
                 if (SelectedProject != null)
                 {
                     OnProjectSelected?.Invoke(SelectedProject);
+                }
+            });
+
+            LogoutCommand = new RelayCommand(() =>
+            {
+                AppSession.JwtToken = null;
+
+                var loginWindow = new LoginWindow();
+                loginWindow.Show();
+
+                foreach (System.Windows.Window window in System.Windows.Application.Current.Windows)
+                {
+                    if (window is MainWindow)
+                    {
+                        window.Close();
+                        break;
+                    }
                 }
             });
 

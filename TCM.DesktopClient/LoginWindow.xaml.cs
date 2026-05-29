@@ -26,7 +26,7 @@ namespace TCM.DesktopClient
 
             try
             {
-                using var client = new HttpClient { BaseAddress = new Uri("https://localhost:7243/") };
+                var client = new HttpClient { BaseAddress = new Uri(AppSettings.ApiBaseUrl) };
                 var response = await client.PostAsJsonAsync("api/Auth/login", loginDto);
 
                 if (response.IsSuccessStatusCode)

@@ -16,7 +16,20 @@
                 </Style>
             </StackPanel.Style>
 
-            <TextBlock Text="Your Projects" FontSize="24" FontWeight="Bold" Margin="0,0,0,15"/>
+            <Grid Grid.Row="0" Margin="0,0,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="Select project" FontSize="26" FontWeight="Bold" VerticalAlignment="Center" Foreground="#333"/>
+
+                <Menu Grid.Column="1" Background="Transparent" VerticalAlignment="Center" HorizontalAlignment="Right">
+                    <MenuItem Header="☰" FontSize="22" Foreground="#333" Padding="10,5" Cursor="Hand" ToolTip="User Menu">
+                        <MenuItem Header="Log out" Command="{Binding LogoutCommand}" FontSize="14" Foreground="#DC3545" FontWeight="SemiBold" Padding="10,5"/>
+                    </MenuItem>
+                </Menu>
+            </Grid>
 
             <DataGrid ItemsSource="{Binding Projects}" SelectedItem="{Binding SelectedProject}" AutoGenerateColumns="False" IsReadOnly="True" MinHeight="250" Margin="0,0,0,20">
                 <DataGrid.Columns>
@@ -29,10 +42,10 @@
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
-                    <DataGridTextColumn Header="Code Parser" Binding="{Binding ParserName}" Width="120" Foreground="Gray"/>
-                    <DataGridTextColumn Header="Results Format" Binding="{Binding TestResultParser}" Width="120" Foreground="Gray"/>
+                    <DataGridTextColumn Header="Code parser" Binding="{Binding ParserName}" Width="120" Foreground="Gray"/>
+                    <DataGridTextColumn Header="Results format" Binding="{Binding TestResultParser}" Width="120" Foreground="Gray"/>
                     <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100" Foreground="#FF17A2B8" FontWeight="SemiBold"/>
-                    <DataGridTextColumn Header="Created At" Binding="{Binding CreatedAt, StringFormat=\{0:yyyy-MM-dd\}}" Width="100"/>
+                    <DataGridTextColumn Header="Created at" Binding="{Binding CreatedAt, StringFormat=\{0:yyyy-MM-dd\}}" Width="100"/>
                 </DataGrid.Columns>
                 <DataGrid.InputBindings>
                     <MouseBinding Gesture="LeftDoubleClick" Command="{Binding OpenProjectCommand}"/>
