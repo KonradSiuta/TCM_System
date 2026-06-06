@@ -110,7 +110,6 @@ namespace TCM.DesktopClient.ViewModels
         public TestPriority SelectedPriorityFilter { get; set; } = TestPriority.Smoke;
         public Array Priorities => Enum.GetValues(typeof(TestPriority));
 
-        // --- KOMENDY ---
         public ICommand OpenCreatorCommand { get; }
         public ICommand CancelCreatorCommand { get; }
         public ICommand SelectByPriorityCommand { get; }
@@ -192,7 +191,11 @@ namespace TCM.DesktopClient.ViewModels
             if (tcs != null)
             {
                 AvailableTestCases.Clear();
-                foreach (var tc in tcs) AvailableTestCases.Add(tc);
+
+                foreach (var tc in tcs.Where(t => t.IsActive))
+                {
+                    AvailableTestCases.Add(tc);
+                }
             }
         }
 

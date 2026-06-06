@@ -30,7 +30,6 @@ namespace TCM.DesktopClient.ViewModels
             set { _summary = value; OnPropertyChanged(nameof(Summary)); }
         }
 
-        // Kolekcje zasilające wykresy
         public ObservableCollection<ChartItem> ReqStatusChart { get; set; } = new();
         public ObservableCollection<ChartItem> TcPriorityChart { get; set; } = new();
 

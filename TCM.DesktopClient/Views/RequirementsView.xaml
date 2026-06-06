@@ -8,7 +8,7 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
-            <Button Content="Import from CSV" Command="{Binding ImportCsvCommand}" IsEnabled="{Binding IsAdmin}" Width="130" Background="#FF28A745" Foreground="White" BorderThickness="0" Padding="8"/>
+            <Button Content="Import from CSV" Command="{Binding ImportCsvCommand}" IsEnabled="{Binding IsAdmin}" Width="130" Background="#FF28A745" Foreground="Gray" BorderThickness="0" Padding="8"/>
         </StackPanel>
 
         <DataGrid Grid.Row="1" ItemsSource="{Binding Requirements}" AutoGenerateColumns="False" IsReadOnly="True" AlternatingRowBackground="#FFF0F0F0">

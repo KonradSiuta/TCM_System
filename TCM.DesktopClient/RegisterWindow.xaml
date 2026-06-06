@@ -7,23 +7,23 @@
         <StackPanel VerticalAlignment="Center">
             <TextBlock Text="Create new account" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20"/>
 
-            <TextBlock Text="Username:" Margin="0,0,0,5" FontWeight="SemiBold"/>
-            <TextBox x:Name="UsernameTxt" Margin="0,0,0,10" Padding="5"/>
+            <TextBlock Text="Username:" Margin="10,0,10,5" FontWeight="SemiBold"/>
+            <TextBox x:Name="UsernameTxt" Margin="10,0,10,10" Padding="5"/>
 
-            <TextBlock Text="Email:" Margin="0,0,0,5" FontWeight="SemiBold"/>
-            <TextBox x:Name="EmailTxt" Margin="0,0,0,10" Padding="5"/>
+            <TextBlock Text="Email:" Margin="10,0,10,5" FontWeight="SemiBold"/>
+            <TextBox x:Name="EmailTxt" Margin="10,0,10,10" Padding="5"/>
 
-            <TextBlock Text="Passwword:" Margin="0,0,0,5" FontWeight="SemiBold"/>
-            <PasswordBox x:Name="PasswordBox" Margin="0,0,0,10" Padding="5"/>
+            <TextBlock Text="Passwword:" Margin="10,0,10,5" FontWeight="SemiBold"/>
+            <PasswordBox x:Name="PasswordBox" Margin="10,0,10,10" Padding="5"/>
 
-            <TextBlock Text="Confirm password:" Margin="0,0,0,5" FontWeight="SemiBold"/>
-            <PasswordBox x:Name="ConfirmPasswordBox" Margin="0,0,0,15" Padding="5"/>
+            <TextBlock Text="Confirm password:" Margin="10,0,10,5" FontWeight="SemiBold"/>
+            <PasswordBox x:Name="ConfirmPasswordBox" Margin="10,0,10,15" Padding="5"/>
 
-            <TextBlock x:Name="StatusText" HorizontalAlignment="Center" Margin="0,0,0,10" Visibility="Collapsed" TextWrapping="Wrap" TextAlignment="Center"/>
+            <TextBlock x:Name="StatusText" HorizontalAlignment="Center" Margin="10,0,10,10" Visibility="Collapsed" TextWrapping="Wrap" TextAlignment="Center"/>
 
-            <Button x:Name="RegisterBtn" Content="Create account" Padding="10" Background="#FF28A745" Foreground="White" BorderThickness="0" Click="RegisterButton_Click"/>
+            <Button x:Name="RegisterBtn" Content="Create account" Margin="10,0,10,0" Padding="10" Background="#FF28A745" Foreground="White" BorderThickness="0" Click="RegisterButton_Click"/>
 
-            <Button Content="Sign in" Background="Transparent" Foreground="#FF007ACC" BorderThickness="0" Margin="0,15,0,0" Click="BackToLogin_Click"/>
+            <Button Content="Sign in" Background="Transparent" Foreground="#FF007ACC" BorderThickness="0" Margin="10,15,10,0" Click="BackToLogin_Click"/>
         </StackPanel>
     </Grid>
 </Window>

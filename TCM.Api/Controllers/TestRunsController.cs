@@ -62,8 +62,15 @@ namespace TCM.Api.Controllers
             if (dto.TestCaseIds == null || !dto.TestCaseIds.Any())
                 return BadRequest("You must select at least one test case.");
 
-            if (dto.TestCaseIds == null || !dto.TestCaseIds.Any())
-                return BadRequest("You must select at least one test case.");
+            var validTestCaseIds = await _context.TestCases
+                .Where(tc => tc.ProjectId == dto.ProjectId && tc.IsActive == true && dto.TestCaseIds.Contains(tc.Id))
+                .Select(tc => tc.Id)
+                .ToListAsync();
+
+            if (validTestCaseIds.Count != dto.TestCaseIds.Count)
+            {
+                return BadRequest("Jeden lub więcej przypadków testowych jest nieaktywnych lub nie należy do tego projektu.");
+            }
 
             var testRun = new TestRun
             {
@@ -78,7 +85,7 @@ namespace TCM.Api.Controllers
             await _context.SaveChangesAsync();
 
             var executions = new List<TestExecution>();
-            foreach (var tcId in dto.TestCaseIds)
+            foreach (var tcId in validTestCaseIds)
             {
                 executions.Add(new TestExecution
                 {
